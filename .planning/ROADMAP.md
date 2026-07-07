@@ -6,7 +6,7 @@ Mockly is built in 7 sequential phases starting from the foundational scaffoldin
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** - Basic MERN setup, auth, database schema, role definitions, and initial question CRUD.
+- [x] **Phase 1: Foundation** - Basic MERN setup, auth, database schema, role definitions, and initial question CRUD. (completed 2026-07-07)
 - [ ] **Phase 2: Core AI Evaluation** - Integrates local Ollama LLM, embeds cosine similarity, and builds the hybrid scoring and feedback pipeline.
 - [ ] **Phase 3: Progress Dashboard** - Implements charts showing topic performance over time and a weak-area recommendations system.
 - [ ] **Phase 4: Mock Interview Mode** - Implements timed multi-question interview sessions with automated timeout submissions and reports.
@@ -26,9 +26,9 @@ Mockly is built in 7 sequential phases starting from the foundational scaffoldin
   3. Frontend fetches and displays questions filtered by target roles.
 **Plans**: 3 plans
 Plans:
-- [ ] 01-01: Scaffold client (Vite+React+Tailwind) and server (Express+Mongoose) monorepo
-- [ ] 01-02: User model, Auth controllers/routes, and login/register UI forms
-- [ ] 01-03: Role and Question schemas, seeding script, and client question browser page
+- [x] 01-01: Scaffold client (Vite+React+Tailwind) and server (Express+Mongoose) monorepo
+- [x] 01-02: User model, Auth controllers/routes, and login/register UI forms
+- [x] 01-03: Role and Question schemas, seeding script, and client question browser page
 
 ### Phase 2: Core AI Evaluation
 **Goal**: Build local AI evaluation services using Ollama for keyword matching, vector embeddings similarity, and LLM rating.
@@ -115,7 +115,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 3/3 | Complete    | 2026-07-07 |
 | 2. Core AI Evaluation | 0/3 | Not started | - |
 | 3. Progress Dashboard | 0/2 | Not started | - |
 | 4. Mock Interview Mode | 0/2 | Not started | - |
