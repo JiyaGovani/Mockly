@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import dbConnect from './config/db.js';
 import healthRouter from './routes/health.js';
 import authRouter from './routes/auth.js';
+import rolesRouter from './routes/roles.js';
+import questionsRouter from './routes/questions.js';
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ dbConnect();
 
 app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/roles', rolesRouter);
+app.use('/api/questions', questionsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
