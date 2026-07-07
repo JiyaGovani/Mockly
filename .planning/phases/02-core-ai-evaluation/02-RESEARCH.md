@@ -39,7 +39,7 @@ Ollama runs locally as a background service and exposes a REST API at `http://lo
 - **Response:**
   ```json
   {
-    "response": "{\"score\": 85, \"feedback\": {\"strengths\": \"...\", \"weaknesses\": \"...\", \"missingPoints\": \"...\", \"suggestions\": \"...\"}}"
+    "response": "{\"score\": 85, \"strengths\": [\"...\"], \"weaknesses\": [\"...\"], \"missingPoints\": [\"...\"], \"suggestions\": [\"...\"]}"
   }
   ```
 
