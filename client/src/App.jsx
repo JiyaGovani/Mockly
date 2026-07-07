@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Questions from './pages/Questions';
+import Practice from './pages/Practice';
 
 /**
  * ProtectedRoute — redirects to /login when not authenticated.
@@ -72,6 +73,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Questions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/practice/:id"
+            element={
+              <ProtectedRoute>
+                <Practice />
               </ProtectedRoute>
             }
           />
