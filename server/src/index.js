@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import dbConnect from './config/db.js';
 import healthRouter from './routes/health.js';
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 dbConnect();
 
 app.use('/api/health', healthRouter);
+app.use('/api/auth', authRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
