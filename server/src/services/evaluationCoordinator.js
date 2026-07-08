@@ -22,6 +22,30 @@ export async function evaluateAttempt({ questionId, userAnswer }) {
     throw new Error('Question not found');
   }
 
+  // Quick validation guard for empty or noise responses (e.g., '::')
+  const cleaned = userAnswer.replace(/[^a-zA-Z0-9]/g, '').trim();
+  if (cleaned.length < 5) {
+    return {
+      question: question._id,
+      overallScore: 0,
+      keywordScore: 0,
+      embeddingScore: 0,
+      llmScore: 0,
+      semanticSimilarity: 0,
+      matchedKeywords: [],
+      missingKeywords: question.keyPoints || [],
+      strengths: [],
+      weaknesses: ['The answer is too short, empty, or contains only non-alphanumeric characters.'],
+      missingPoints: question.keyPoints || [],
+      suggestions: ['Please write a descriptive answer explaining the concept in detail.'],
+      latency: {
+        embedding: 0,
+        llm: 0,
+        total: Date.now() - totalStart,
+      },
+    };
+  }
+
   // 2. Parallel calculations: Keyword Matching & Embedding Similarity
   const embedStart = Date.now();
 
@@ -46,9 +70,17 @@ export async function evaluateAttempt({ questionId, userAnswer }) {
 
     const userVec = await getEmbedding(userAnswer);
     const similarity = calculateCosineSimilarity(expectedVec, userVec);
+    
+    // Normalize similarity score using a 0.45 relevance threshold
+    // Any similarity below 0.45 is graded as 0 to filter out noise/random words.
+    // Similarities from 0.45 to 1.0 are scaled from 0% to 100%.
+    const normalizedScore = similarity < 0.45 
+      ? 0 
+      : Math.round(((similarity - 0.45) / (0.55)) * 100);
+
     return {
       similarity,
-      score: Math.round(Math.max(0, similarity) * 100),
+      score: Math.min(100, Math.max(0, normalizedScore)),
     };
   })();
 

@@ -43,6 +43,7 @@ ${userAnswer}
 
 Evaluate the student's answer based on the reference answer and pre-calculated metrics.
 Provide constructive, direct, technical feedback.
+If the student's answer is empty, completely incorrect, off-topic, or contains nonsensical noise, you MUST assign a score of 0.
 
 You MUST respond with ONLY a valid, raw JSON object matching the schema below.
 DO NOT wrap the response in markdown blocks (e.g. do NOT use \`\`\`json).

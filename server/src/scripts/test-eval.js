@@ -28,7 +28,6 @@ async function test() {
   console.log('=======================================\n');
 
   // Let's define a mock user answer
-  // We'll compose it to match some keypoints and be semantically similar
   const userAnswer = `
     A stack is a linear data structure that operates on a LIFO (Last In First Out) principle. 
     It supports two main operations: push (to add an element to the top) and pop (to remove the top element).
