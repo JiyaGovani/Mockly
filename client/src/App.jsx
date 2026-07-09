@@ -10,6 +10,10 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Questions from './pages/Questions';
 import Practice from './pages/Practice';
+import Dashboard from './pages/Dashboard';
+import MockInterview from './pages/MockInterview';
+import MockScorecard from './pages/MockScorecard';
+
 
 /**
  * ProtectedRoute — redirects to /login when not authenticated.
@@ -84,6 +88,30 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mock/:id"
+            element={
+              <ProtectedRoute>
+                <MockInterview />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mock/scorecard/:id"
+            element={
+              <ProtectedRoute>
+                <MockScorecard />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthProvider>
     </Router>
@@ -91,3 +119,4 @@ function App() {
 }
 
 export default App;
+

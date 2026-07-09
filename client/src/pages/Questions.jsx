@@ -131,6 +131,7 @@ function QuestionModal({ question, onClose }) {
 
 // ─── Main Questions Page ───
 export default function Questions() {
+  const navigate = useNavigate();
   const [roles, setRoles] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
@@ -145,6 +146,23 @@ export default function Questions() {
 
   // Modal
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+
+  // Mock interview state
+  const [showMockModal, setShowMockModal] = useState(false);
+  const [mockRole, setMockRole] = useState('');
+  const [startingMock, setStartingMock] = useState(false);
+
+  const startMockInterview = async () => {
+    if (!mockRole) return;
+    setStartingMock(true);
+    try {
+      const { data } = await api.post('/sessions/start', { role: mockRole });
+      navigate(`/mock/${data.session._id}`);
+    } catch (err) {
+      console.error('Failed to start mock:', err);
+      setStartingMock(false);
+    }
+  };
 
   // Debounce search
   useEffect(() => {
@@ -201,11 +219,22 @@ export default function Questions() {
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 page-enter">
         {/* Page header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-100">Question Bank</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Browse interview questions by role, type, and difficulty
-          </p>
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-100">Question Bank</h1>
+            <p className="text-slate-400 text-sm mt-1">
+              Browse interview questions by role, type, and difficulty
+            </p>
+          </div>
+          <button
+            onClick={() => setShowMockModal(true)}
+            className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all flex items-center gap-2 flex-shrink-0"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Start Mock Interview
+          </button>
         </div>
 
         {/* Role tabs */}
@@ -373,6 +402,61 @@ export default function Questions() {
         question={selectedQuestion}
         onClose={() => setSelectedQuestion(null)}
       />
+
+      {/* Mock Interview Modal */}
+      {showMockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowMockModal(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="glass-card relative w-full max-w-md p-6 md:p-8 page-enter" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowMockModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-lg font-bold text-slate-100 mb-2">Start Mock Interview</h2>
+            <p className="text-sm text-slate-400 mb-6">
+              10 balanced questions • 45-minute timer • AI-graded scorecard
+            </p>
+
+            <label className="block text-sm font-medium text-slate-300 mb-2">Select Target Role</label>
+            <select
+              value={mockRole}
+              onChange={(e) => setMockRole(e.target.value)}
+              className="input-field w-full text-sm py-2.5 px-3 cursor-pointer mb-6"
+            >
+              <option value="" className="bg-slate-800">Choose a role...</option>
+              {roles.map((role) => (
+                <option key={role._id} value={role.name} className="bg-slate-800">
+                  {role.displayName}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={startMockInterview}
+              disabled={!mockRole || startingMock}
+              className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {startingMock ? (
+                <>
+                  <div className="spinner" style={{ width: '1rem', height: '1rem' }} />
+                  Starting...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Begin Interview
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
