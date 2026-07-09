@@ -35,6 +35,10 @@ const questionSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    expectedAnswerEmbedding: {
+      type: [Number],
+      default: undefined,
+    },
 
     // --- MCQ fields (only for type === 'aptitude') ---
     options: {

@@ -1,14 +1,17 @@
 # Roadmap: Mockly
 
 ## Overview
+# Roadmap: Mockly
+
+## Overview
 
 Mockly is built in 7 sequential phases starting from the foundational scaffolding, transitioning through the core AI scoring mechanics, visual feedback, mock simulation features, gated evaluation flow, administration, and finally polishing/security.
 
 ## Phases
 
-- [x] **Phase 1: Foundation** - Basic MERN setup, auth, database schema, role definitions, and initial question CRUD. (completed 2026-07-07)
-- [ ] **Phase 2: Core AI Evaluation** - Integrates local Ollama LLM, embeds cosine similarity, and builds the hybrid scoring and feedback pipeline.
-- [ ] **Phase 3: Progress Dashboard** - Implements charts showing topic performance over time and a weak-area recommendations system.
+- [x] **Phase 1: Foundation** - Basic MERN setup, auth, database schema, role definitions, and initial question CRUD. (completed 2026-07-07)
+- [x] **Phase 2: Core AI Evaluation** - Integrates local Ollama LLM, embeds cosine similarity, and builds the hybrid scoring and feedback pipeline. (completed 2026-07-09)
+- [x] **Phase 3: Progress Dashboard** - Implements charts showing topic performance over time and a weak-area recommendations system. (completed 2026-07-09)
 - [ ] **Phase 4: Mock Interview Mode** - Implements timed multi-question interview sessions with automated timeout submissions and reports.
 - [ ] **Phase 5: 3-Round Interview Flow** - Builds placement simulation flow (Aptitude MCQ -> Tech -> HR) with gating and retry limits.
 - [ ] **Phase 6: Admin Panel** - Provides an admin interface to manage questions, roles, and view aggregate user statistics.
@@ -40,9 +43,9 @@ Plans:
   3. Feedback displays strengths, weaknesses, missing points, and tips.
 **Plans**: 3 plans
 Plans:
-- [ ] 02-01: Ollama configuration, keyword service, and cosine similarity embeddings service
-- [ ] 02-02: LLM grading service, prompt templates, and overall scoring coordinator
-- [ ] 02-03: Practice question page with answering text area, score details, and feedback cards
+- [x] 02-01: Ollama configuration, keyword service, and cosine similarity embeddings service
+- [x] 02-02: LLM grading service, prompt templates, and overall scoring coordinator
+- [x] 02-03: Practice question page with answering text area, score details, and feedback cards
 
 ### Phase 3: Progress Dashboard
 **Goal**: Implement student progress tracker with data visualization and tailored recommendations.
@@ -53,8 +56,8 @@ Plans:
   2. System suggests three recommended questions from user's weakest topics.
 **Plans**: 2 plans
 Plans:
-- [ ] 03-01: Dashboard stats & timeseries aggregation APIs, with Recharts visual charts
-- [ ] 03-02: Recommendation engine logic and frontend recommendation section
+- [x] 03-01: Dashboard stats & timeseries aggregation APIs, with Recharts visual charts
+- [x] 03-02: Recommendation engine logic and frontend recommendation section
 
 ### Phase 4: Mock Interview Mode
 **Goal**: Implement timed multi-question interview sessions mimicking real-world pressure.
@@ -116,8 +119,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete    | 2026-07-07 |
-| 2. Core AI Evaluation | 0/3 | Not started | - |
-| 3. Progress Dashboard | 0/2 | Not started | - |
+| 2. Core AI Evaluation | 3/3 | Complete    | 2026-07-09 |
+| 3. Progress Dashboard | 2/2 | Complete    | 2026-07-09 |
 | 4. Mock Interview Mode | 0/2 | Not started | - |
 | 5. 3-Round Interview Flow | 0/2 | Not started | - |
 | 6. Admin Panel | 0/2 | Not started | - |
