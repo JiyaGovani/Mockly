@@ -23,11 +23,11 @@
 
 ## Top 3 Priority Fixes
 
-No priority blocker/major fixes found. Below are 3 minor recommendations for visual/UX enhancement:
+No priority blocker/major fixes found. Below are 3 minor recommendations that have been successfully implemented:
 
-1. **Textarea Autofocus** — *UX improvement* — When navigating to a question in the workspace, automatically focus the textarea so the user can start typing immediately without clicking.
-2. **Tab Close Confirmation** — *Resilience improvement* — Add a `beforeunload` event listener to warn the user if they accidentally close/refresh the browser tab during a live interview.
-3. **Scorecard Accordion Animation** — *Visual smoothness* — Add CSS transitions or smooth height collapse animations for expanding/collapsing individual question details.
+1. **[IMPLEMENTED] Textarea Autofocus** — *UX improvement* — Focused the text input area automatically on mounting/changing active question so user can start typing instantly.
+2. **[IMPLEMENTED] Tab Close Confirmation** — *Resilience improvement* — Wired up a `beforeunload` event handler that prevents losing interview progress by warning user on reload/close tab actions.
+3. **[IMPLEMENTED] Scorecard Accordion Animation** — *Visual smoothness* — Upgraded the conditional DOM rendering to a fully transitioned height block using standard CSS transitions.
 
 ---
 
