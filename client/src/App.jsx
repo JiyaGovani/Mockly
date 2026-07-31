@@ -13,6 +13,8 @@ import Practice from './pages/Practice';
 import Dashboard from './pages/Dashboard';
 import MockInterview from './pages/MockInterview';
 import MockScorecard from './pages/MockScorecard';
+import PlacementHub from './pages/PlacementHub';
+import AptitudeWorkspace from './pages/AptitudeWorkspace';
 
 
 /**
@@ -109,6 +111,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <MockScorecard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/placement"
+            element={
+              <ProtectedRoute>
+                <PlacementHub />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/placement/aptitude"
+            element={
+              <ProtectedRoute>
+                <AptitudeWorkspace />
               </ProtectedRoute>
             }
           />
