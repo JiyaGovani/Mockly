@@ -15,6 +15,10 @@ import MockInterview from './pages/MockInterview';
 import MockScorecard from './pages/MockScorecard';
 import PlacementHub from './pages/PlacementHub';
 import AptitudeWorkspace from './pages/AptitudeWorkspace';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminQuestions from './pages/admin/AdminQuestions';
+import AdminRoles from './pages/admin/AdminRoles';
+import AdminUsers from './pages/admin/AdminUsers';
 
 
 /**
@@ -33,6 +37,24 @@ function ProtectedRoute({ children }) {
   }
 
   return user ? children : <Navigate to="/login" replace />;
+}
+
+/**
+ * AdminRoute — redirects non-admin users to /questions.
+ */
+function AdminRoute({ children }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="spinner" style={{ width: '2rem', height: '2rem' }} />
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/login" replace />;
+  return user.role === 'admin' ? children : <Navigate to="/questions" replace />;
 }
 
 /**
@@ -128,6 +150,38 @@ function App() {
               <ProtectedRoute>
                 <AptitudeWorkspace />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/questions"
+            element={
+              <AdminRoute>
+                <AdminQuestions />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/roles"
+            element={
+              <AdminRoute>
+                <AdminRoles />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminRoute>
+                <AdminUsers />
+              </AdminRoute>
             }
           />
         </Routes>
