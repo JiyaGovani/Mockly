@@ -1,8 +1,7 @@
-import axios from 'axios';
-import { OLLAMA_URL, OLLAMA_EMBED_MODEL, OLLAMA_TIMEOUT } from '../config/ollama.js';
+import { genAI, GEMINI_EMBED_MODEL, GEMINI_API_KEY } from '../config/gemini.js';
 
 /**
- * Fetch vector embedding from local Ollama embeddings endpoint.
+ * Fetch vector embedding from Google Gemini embeddings endpoint (text-embedding-004).
  *
  * @param {string} text 
  * @returns {Promise<number[]>}
@@ -12,40 +11,22 @@ export async function getEmbedding(text) {
     return [];
   }
 
-  try {
-    const response = await axios.post(
-      `${OLLAMA_URL}/api/embeddings`,
-      {
-        model: OLLAMA_EMBED_MODEL,
-        prompt: text,
-      },
-      {
-        timeout: OLLAMA_TIMEOUT,
-      }
-    );
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    const keyErr = new Error('GEMINI_API_KEY is missing or invalid in server/.env file');
+    keyErr.statusCode = 500;
+    throw keyErr;
+  }
 
-    if (response.data && response.data.embedding) {
-      return response.data.embedding;
+  try {
+    const model = genAI.getGenerativeModel({ model: GEMINI_EMBED_MODEL });
+    const result = await model.embedContent(text);
+
+    if (result && result.embedding && Array.isArray(result.embedding.values)) {
+      return result.embedding.values;
     }
-    throw new Error('Invalid embedding response from Ollama');
+    throw new Error('Invalid embedding response from Gemini API');
   } catch (err) {
-    console.error('Error fetching embedding from Ollama:', err.message);
-    // Propagate standard error details for routing error handling
-    if (err.code === 'ECONNREFUSED') {
-      const offlineErr = new Error('Ollama service offline');
-      offlineErr.statusCode = 503;
-      throw offlineErr;
-    }
-    if (err.response?.status === 404) {
-      const modelErr = new Error(`Embedding model '${OLLAMA_EMBED_MODEL}' not found`);
-      modelErr.statusCode = 404;
-      throw modelErr;
-    }
-    if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
-      const timeoutErr = new Error('Inference request timed out');
-      timeoutErr.statusCode = 504;
-      throw timeoutErr;
-    }
+    console.error('Error fetching embedding from Gemini API:', err.message);
     throw err;
   }
 }

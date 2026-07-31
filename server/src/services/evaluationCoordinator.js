@@ -55,10 +55,11 @@ export async function evaluateAttempt({ questionId, userAnswer }) {
 
   // Embedding caching check
   const embeddingPromise = (async () => {
+    const userVec = await getEmbedding(userAnswer);
     let expectedVec = question.expectedAnswerEmbedding;
     
-    // If not cached, generate and cache expected answer embedding
-    if (!expectedVec || expectedVec.length === 0) {
+    // If not cached or dimension mismatched (e.g. model change), generate and cache expected answer embedding
+    if (!expectedVec || expectedVec.length === 0 || expectedVec.length !== userVec.length) {
       if (question.expectedAnswer) {
         expectedVec = await getEmbedding(question.expectedAnswer);
         if (expectedVec && expectedVec.length > 0) {
@@ -68,7 +69,6 @@ export async function evaluateAttempt({ questionId, userAnswer }) {
       }
     }
 
-    const userVec = await getEmbedding(userAnswer);
     const similarity = calculateCosineSimilarity(expectedVec, userVec);
     
     // Normalize similarity score using a 0.45 relevance threshold
