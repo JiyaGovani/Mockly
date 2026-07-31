@@ -19,7 +19,7 @@ async function test() {
   }
 
   console.log('\n=======================================');
-  console.log('Testing Evaluation Coordinator Pipeline');
+  console.log('Testing Evaluation Coordinator Pipeline (Gemini API)');
   console.log('=======================================');
   console.log(`Question ID: ${question._id}`);
   console.log(`Question:    "${question.text}"`);
@@ -35,7 +35,7 @@ async function test() {
   `;
 
   console.log(`User Answer:\n"${userAnswer.trim()}"\n`);
-  console.log('Running evaluation (Ollama call might take 5-30s)...');
+  console.log('Running evaluation via Gemini API...');
 
   try {
     const start = Date.now();
@@ -58,12 +58,9 @@ async function test() {
       console.error('Mapped StatusCode:', err.statusCode);
     }
     console.error('\nTips:');
-    if (err.message.includes('offline') || err.code === 'ECONNREFUSED') {
-      console.error('👉 Make sure Ollama background service is running on your host machine:');
-      console.error('   run "ollama serve" in a terminal.');
-    } else if (err.message.includes('not found') || err.message.includes('404')) {
-      console.error('👉 Ensure you have downloaded the required models:');
-      console.error('   run "ollama pull llama3" and "ollama pull nomic-embed-text"');
+    if (err.message.includes('GEMINI_API_KEY')) {
+      console.error('👉 Make sure GEMINI_API_KEY is configured in your server/.env file.');
+      console.error('   Get your free API key at: https://aistudio.google.com/');
     }
     console.error('=======================================\n');
   } finally {

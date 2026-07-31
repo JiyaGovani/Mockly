@@ -13,7 +13,7 @@ Empower students to improve their interview performance through highly analytica
 - **Frontend**: React (Vite), Tailwind CSS, Recharts, Axios
 - **Backend**: Node.js, Express, Mongoose
 - **Database**: MongoDB
-- **Local AI**: Ollama running Llama 3 8B (default) and Ollama embeddings API
+- **AI Evaluation**: Google Gemini API (gemini-3.5-flash-lite) & Gemini Embeddings (gemini-embedding-001)
 - **Auth**: JWT (JSON Web Tokens), bcrypt for password hashing
 <!-- GSD:stack-end -->
 
