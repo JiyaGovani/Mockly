@@ -323,15 +323,46 @@ export default function MockInterview() {
                 {currentQuestion.text}
               </h3>
 
-              {/* Answer textarea */}
-              <textarea
-                ref={textareaRef}
-                value={answers[currentQuestion._id] || ''}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                placeholder="Type your answer here..."
-                rows={10}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/25 resize-none text-sm leading-relaxed transition-all"
-              />
+              {/* MCQ Options Selector vs Answer textarea */}
+              {Array.isArray(currentQuestion.options) && currentQuestion.options.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                  {currentQuestion.options.map((opt, i) => {
+                    const letter = String.fromCharCode(65 + i);
+                    const currentAns = (answers[currentQuestion._id] || '').trim();
+                    const isSelected = currentAns.toLowerCase() === opt.toLowerCase() ||
+                                       currentAns.toUpperCase() === letter ||
+                                       currentAns === String(i);
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => handleAnswerChange(opt)}
+                        className={`flex items-center gap-3 p-4 rounded-xl text-left border transition-all ${
+                          isSelected
+                            ? 'bg-indigo-500/20 border-indigo-500 text-slate-100 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500'
+                            : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                        }`}
+                      >
+                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
+                          isSelected ? 'bg-indigo-500 text-white' : 'bg-white/10 text-slate-400'
+                        }`}>
+                          {letter}
+                        </span>
+                        <span className="text-sm font-medium flex-1 leading-snug">{opt}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <textarea
+                  ref={textareaRef}
+                  value={answers[currentQuestion._id] || ''}
+                  onChange={(e) => handleAnswerChange(e.target.value)}
+                  placeholder="Type your answer here..."
+                  rows={10}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/25 resize-none text-sm leading-relaxed transition-all"
+                />
+              )}
             </div>
           </div>
 

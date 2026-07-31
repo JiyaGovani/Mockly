@@ -339,125 +339,221 @@ export default function Practice() {
           <LoadingCard currentStep={loadingStep} />
         ) : result ? (
           /* ─── Results Scorecard ─── */
-          <div className="space-y-6 page-enter">
-
-            {/* Overall Score + Metrics Row */}
-            <div className="glass-card p-6 md:p-8">
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                {/* Score Ring */}
-                <ScoreRing score={result.overallScore} size={140} stroke={10} label="Overall Score" />
-
-                {/* Metrics */}
-                <div className="flex-1 w-full space-y-4">
-                  <MetricBar label="Keyword Coverage" value={result.keywordScore} icon="🔑" />
-                  <MetricBar
-                    label="Semantic Similarity"
-                    value={Math.round((result.semanticSimilarity || 0) * 100)}
-                    icon="🧬"
+          result.isMcq || (question?.options && question.options.length > 0) ? (
+            /* ─── Clean MCQ Result Scorecard ─── */
+            <div className="space-y-6 page-enter">
+              <div className="glass-card p-6 md:p-8 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <ScoreRing 
+                    score={result.overallScore} 
+                    size={140} 
+                    stroke={10} 
+                    label={result.overallScore === 100 ? "100% Correct" : "0% Incorrect"} 
                   />
-                  <MetricBar label="AI Evaluation" value={result.llmScore} icon="🤖" />
+                  <div>
+                    <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold ${
+                      result.overallScore === 100
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                    }`}>
+                      {result.overallScore === 100 ? '🎉 Correct Answer!' : '❌ Incorrect Selection'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    ⏱ Evaluated instantly in {result.latency?.total || 5}ms
+                  </p>
                 </div>
               </div>
 
-              {/* Latency Stats */}
-              {result.latency && (
-                <div className="mt-6 pt-4 border-t border-white/10 flex flex-wrap gap-4 text-xs text-slate-500">
-                  <span>⚡ Embedding: {result.latency.embedding}ms</span>
-                  <span>🧠 LLM: {(result.latency.llm / 1000).toFixed(1)}s</span>
-                  <span>⏱ Total: {(result.latency.total / 1000).toFixed(1)}s</span>
+              {/* Feedback Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FeedbackCard
+                  title="Status"
+                  items={result.strengths?.length > 0 ? result.strengths : result.weaknesses}
+                  icon={result.overallScore === 100 ? "✅" : "⚠️"}
+                  colorClass={result.overallScore === 100 ? "text-emerald-400" : "text-amber-400"}
+                />
+                <FeedbackCard
+                  title={result.overallScore === 100 ? "Explanation" : "Correct Option"}
+                  items={result.missingPoints?.length > 0 ? result.missingPoints : result.suggestions}
+                  icon="🎯"
+                  colorClass="text-indigo-400"
+                />
+              </div>
+
+              {/* Try Again */}
+              <div className="flex gap-3">
+                <button onClick={handleReset} className="btn-primary flex-1">
+                  🔄 Try Again
+                </button>
+                <button
+                  onClick={() => navigate('/questions')}
+                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 transition-all font-medium"
+                >
+                  ← Back to Questions
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* ─── Standard Descriptive Results Scorecard ─── */
+            <div className="space-y-6 page-enter">
+
+              {/* Overall Score + Metrics Row */}
+              <div className="glass-card p-6 md:p-8">
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  {/* Score Ring */}
+                  <ScoreRing score={result.overallScore} size={140} stroke={10} label="Overall Score" />
+
+                  {/* Metrics */}
+                  <div className="flex-1 w-full space-y-4">
+                    <MetricBar label="Keyword Coverage" value={result.keywordScore} icon="🔑" />
+                    <MetricBar
+                      label="Semantic Similarity"
+                      value={Math.round((result.semanticSimilarity || 0) * 100)}
+                      icon="🧬"
+                    />
+                    <MetricBar label="AI Evaluation" value={result.llmScore} icon="🤖" />
+                  </div>
+                </div>
+
+                {/* Latency Stats */}
+                {result.latency && (
+                  <div className="mt-6 pt-4 border-t border-white/10 flex flex-wrap gap-4 text-xs text-slate-500">
+                    <span>⚡ Embedding: {result.latency.embedding}ms</span>
+                    <span>🧠 LLM: {(result.latency.llm / 1000).toFixed(1)}s</span>
+                    <span>⏱ Total: {(result.latency.total / 1000).toFixed(1)}s</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Keywords */}
+              {(result.matchedKeywords?.length > 0 || result.missingKeywords?.length > 0) && (
+                <div className="glass-card p-5">
+                  <h4 className="text-sm font-semibold text-slate-300 mb-3">🔑 Keyword Analysis</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {result.matchedKeywords?.map((kw, i) => (
+                      <span
+                        key={`m-${i}`}
+                        className="px-2.5 py-1 text-xs rounded-full bg-emerald-500/15 text-emerald-400 font-medium"
+                      >
+                        ✓ {kw}
+                      </span>
+                    ))}
+                    {result.missingKeywords?.map((kw, i) => (
+                      <span
+                        key={`x-${i}`}
+                        className="px-2.5 py-1 text-xs rounded-full bg-red-500/15 text-red-400 font-medium"
+                      >
+                        ✗ {kw}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* Keywords */}
-            {(result.matchedKeywords?.length > 0 || result.missingKeywords?.length > 0) && (
-              <div className="glass-card p-5">
-                <h4 className="text-sm font-semibold text-slate-300 mb-3">🔑 Keyword Analysis</h4>
-                <div className="flex flex-wrap gap-2">
-                  {result.matchedKeywords?.map((kw, i) => (
-                    <span
-                      key={`m-${i}`}
-                      className="px-2.5 py-1 text-xs rounded-full bg-emerald-500/15 text-emerald-400 font-medium"
-                    >
-                      ✓ {kw}
-                    </span>
-                  ))}
-                  {result.missingKeywords?.map((kw, i) => (
-                    <span
-                      key={`x-${i}`}
-                      className="px-2.5 py-1 text-xs rounded-full bg-red-500/15 text-red-400 font-medium"
-                    >
-                      ✗ {kw}
-                    </span>
-                  ))}
-                </div>
+              {/* Feedback Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FeedbackCard
+                  title="Strengths"
+                  items={result.strengths}
+                  icon="💪"
+                  colorClass="text-emerald-400"
+                />
+                <FeedbackCard
+                  title="Weaknesses"
+                  items={result.weaknesses}
+                  icon="⚠️"
+                  colorClass="text-amber-400"
+                />
+                <FeedbackCard
+                  title="Missing Points"
+                  items={result.missingPoints}
+                  icon="❌"
+                  colorClass="text-red-400"
+                />
+                <FeedbackCard
+                  title="Suggestions"
+                  items={result.suggestions}
+                  icon="💡"
+                  colorClass="text-indigo-400"
+                />
               </div>
-            )}
 
-            {/* Feedback Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FeedbackCard
-                title="Strengths"
-                items={result.strengths}
-                icon="💪"
-                colorClass="text-emerald-400"
-              />
-              <FeedbackCard
-                title="Weaknesses"
-                items={result.weaknesses}
-                icon="⚠️"
-                colorClass="text-amber-400"
-              />
-              <FeedbackCard
-                title="Missing Points"
-                items={result.missingPoints}
-                icon="❌"
-                colorClass="text-red-400"
-              />
-              <FeedbackCard
-                title="Suggestions"
-                items={result.suggestions}
-                icon="💡"
-                colorClass="text-indigo-400"
-              />
+              {/* Try Again */}
+              <div className="flex gap-3">
+                <button onClick={handleReset} className="btn-primary flex-1">
+                  🔄 Try Again
+                </button>
+                <button
+                  onClick={() => navigate('/questions')}
+                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 transition-all font-medium"
+                >
+                  ← Back to Questions
+                </button>
+              </div>
             </div>
-
-            {/* Try Again */}
-            <div className="flex gap-3">
-              <button onClick={handleReset} className="btn-primary flex-1">
-                🔄 Try Again
-              </button>
-              <button
-                onClick={() => navigate('/questions')}
-                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 transition-all font-medium"
-              >
-                ← Back to Questions
-              </button>
-            </div>
-          </div>
+          )
         ) : (
           /* ─── Answer Input ─── */
           <div className="glass-card p-6 md:p-8">
             <label className="block text-sm font-medium text-slate-300 mb-3">
-              Your Answer
+              {Array.isArray(question.options) && question.options.length > 0 ? 'Select Your Answer' : 'Your Answer'}
             </label>
-            <textarea
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              placeholder="Type your answer here... Be thorough and include key concepts."
-              rows={10}
-              className="input-field resize-y min-h-[200px] text-sm leading-relaxed"
-            />
 
-            {/* Word count */}
-            <div className="flex items-center justify-between mt-3">
-              <span className="text-xs text-slate-500">
-                {userAnswer.trim().split(/\s+/).filter(Boolean).length} words
-              </span>
-              {error && (
-                <span className="text-xs text-red-400">{error}</span>
-              )}
-            </div>
+            {/* MCQ Options Selector vs Text Area */}
+            {Array.isArray(question.options) && question.options.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {question.options.map((opt, i) => {
+                  const letter = String.fromCharCode(65 + i);
+                  const isSelected = userAnswer.trim().toLowerCase() === opt.toLowerCase() || 
+                                     userAnswer.trim().toUpperCase() === letter ||
+                                     userAnswer.trim() === String(i);
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setUserAnswer(opt)}
+                      className={`flex items-center gap-3 p-4 rounded-xl text-left border transition-all ${
+                        isSelected
+                          ? 'bg-indigo-500/20 border-indigo-500 text-slate-100 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500'
+                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20'
+                      }`}
+                    >
+                      <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
+                        isSelected ? 'bg-indigo-500 text-white' : 'bg-white/10 text-slate-400'
+                      }`}>
+                        {letter}
+                      </span>
+                      <span className="text-sm font-medium flex-1 leading-snug">{opt}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                <textarea
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  placeholder="Type your answer here... Be thorough and include key concepts."
+                  rows={10}
+                  className="input-field resize-y min-h-[200px] text-sm leading-relaxed"
+                />
+
+                {/* Word count */}
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-xs text-slate-500">
+                    {userAnswer.trim().split(/\s+/).filter(Boolean).length} words
+                  </span>
+                  {error && (
+                    <span className="text-xs text-red-400">{error}</span>
+                  )}
+                </div>
+              </>
+            )}
+
+            {error && Array.isArray(question.options) && question.options.length > 0 && (
+              <p className="text-xs text-red-400 mt-3">{error}</p>
+            )}
 
             <button
               onClick={handleSubmit}

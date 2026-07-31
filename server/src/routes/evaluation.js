@@ -30,6 +30,7 @@ router.post('/submit', protect, async (req, res) => {
       embeddingScore: evaluation.embeddingScore,
       llmScore: evaluation.llmScore,
       overallScore: evaluation.overallScore,
+      rubric: evaluation.rubric,
       matchedKeywords: evaluation.matchedKeywords,
       missingKeywords: evaluation.missingKeywords,
       strengths: evaluation.strengths,
