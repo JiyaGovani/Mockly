@@ -34,6 +34,20 @@ const practiceAttemptSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    rubric: {
+      technicalAccuracy: {
+        type: Number,
+        default: 0,
+      },
+      completeness: {
+        type: Number,
+        default: 0,
+      },
+      clarity: {
+        type: Number,
+        default: 0,
+      },
+    },
     matchedKeywords: {
       type: [String],
       default: [],

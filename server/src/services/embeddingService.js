@@ -1,7 +1,7 @@
-import { genAI, GEMINI_EMBED_MODEL, GEMINI_API_KEY } from '../config/gemini.js';
+import { getAIClient, GEMINI_API_KEYS, FALLBACK_EMBED_MODELS } from '../config/gemini.js';
 
 /**
- * Fetch vector embedding from Google Gemini embeddings endpoint (text-embedding-004).
+ * Fetch vector embedding from Google Gemini embeddings endpoint with Fallback Chain.
  *
  * @param {string} text 
  * @returns {Promise<number[]>}
@@ -11,24 +11,50 @@ export async function getEmbedding(text) {
     return [];
   }
 
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+  if (GEMINI_API_KEYS.length === 0) {
     const keyErr = new Error('GEMINI_API_KEY is missing or invalid in server/.env file');
     keyErr.statusCode = 500;
     throw keyErr;
   }
 
-  try {
-    const model = genAI.getGenerativeModel({ model: GEMINI_EMBED_MODEL });
-    const result = await model.embedContent(text);
+  let lastError = null;
 
-    if (result && result.embedding && Array.isArray(result.embedding.values)) {
-      return result.embedding.values;
+  for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
+    const client = getAIClient(keyIdx);
+
+    for (const modelName of FALLBACK_EMBED_MODELS) {
+      try {
+        const model = client.getGenerativeModel({ model: modelName });
+        const result = await model.embedContent(text);
+
+        if (result && result.embedding && Array.isArray(result.embedding.values)) {
+          return result.embedding.values;
+        }
+      } catch (err) {
+        lastError = err;
+        const errMsg = (err.message || '').toLowerCase();
+
+        const isQuotaError = 
+          errMsg.includes('429') || 
+          errMsg.includes('quota') || 
+          errMsg.includes('resource_exhausted') ||
+          errMsg.includes('rate limit') ||
+          errMsg.includes('404') ||
+          errMsg.includes('not found') ||
+          errMsg.includes('503');
+
+        if (isQuotaError) {
+          console.warn(`⚠️ Embedding model '${modelName}' unavailable/rate-limited (Key #${keyIdx + 1}). Trying fallback embedding model...`);
+          continue;
+        }
+
+        throw err;
+      }
     }
-    throw new Error('Invalid embedding response from Gemini API');
-  } catch (err) {
-    console.error('Error fetching embedding from Gemini API:', err.message);
-    throw err;
   }
+
+  console.error('Error fetching embedding from Gemini API:', lastError?.message);
+  throw lastError || new Error('All embedding models exhausted');
 }
 
 /**
