@@ -1,9 +1,9 @@
-import axios from 'axios';
-import { OLLAMA_URL, OLLAMA_MODEL, OLLAMA_TIMEOUT } from '../config/ollama.js';
+import { SchemaType } from '@google/generative-ai';
+import { genAI, GEMINI_MODEL, GEMINI_API_KEY } from '../config/gemini.js';
 
 /**
- * Invoke local Llama 3 via Ollama to evaluate the user's answer.
- * Uses structured prompts and enforces strict JSON schema output.
+ * Invoke Google Gemini API to evaluate the user's answer.
+ * Uses structured prompts and enforces strict JSON schema output via responseSchema.
  *
  * @param {object} params 
  * @param {string} params.questionText 
@@ -22,6 +22,12 @@ export async function evaluateAnswer({
   missingKeywords = [],
   semanticSimilarity = 0,
 }) {
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    const keyErr = new Error('GEMINI_API_KEY is missing or invalid in server/.env file');
+    keyErr.statusCode = 500;
+    throw keyErr;
+  }
+
   const similarityPercent = Math.round(semanticSimilarity * 100);
 
   const prompt = `
@@ -44,85 +50,60 @@ ${userAnswer}
 Evaluate the student's answer based on the reference answer and pre-calculated metrics.
 Provide constructive, direct, technical feedback.
 If the student's answer is empty, completely incorrect, off-topic, or contains nonsensical noise, you MUST assign a score of 0.
-
-You MUST respond with ONLY a valid, raw JSON object matching the schema below.
-DO NOT wrap the response in markdown blocks (e.g. do NOT use \`\`\`json).
-DO NOT include any conversational text, warnings, explanations, or extra characters.
-
-JSON Schema:
-{
-  "score": 85, // Integer rating from 0 to 100 representing answer correctness and depth
-  "strengths": ["list of what they explained well"],
-  "weaknesses": ["list of errors, gaps, or logic problems"],
-  "missingPoints": ["essential details from expected answer they omitted"],
-  "suggestions": ["actionable advice to improve their answer"]
-}
 `;
 
   try {
-    const response = await axios.post(
-      `${OLLAMA_URL}/api/generate`,
-      {
-        model: OLLAMA_MODEL,
-        prompt: prompt,
-        stream: false,
-        options: {
-          temperature: 0.1, // low temperature for deterministic evaluation
+    const model = genAI.getGenerativeModel({
+      model: GEMINI_MODEL,
+      generationConfig: {
+        temperature: 0.1,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            score: {
+              type: SchemaType.INTEGER,
+              description: 'Integer rating from 0 to 100 representing answer correctness and depth',
+            },
+            strengths: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+              description: 'List of what the student explained well',
+            },
+            weaknesses: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+              description: 'List of errors, gaps, or logic problems in the answer',
+            },
+            missingPoints: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+              description: 'Essential details from expected answer omitted by student',
+            },
+            suggestions: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+              description: 'Actionable advice to improve their answer',
+            },
+          },
+          required: ['score', 'strengths', 'weaknesses', 'missingPoints', 'suggestions'],
         },
-        format: 'json',
       },
-      {
-        timeout: OLLAMA_TIMEOUT,
-      }
-    );
+    });
 
-    if (response.data && response.data.response) {
-      const responseText = response.data.response.trim();
-      try {
-        const parsed = JSON.parse(responseText);
-        return {
-          score: Math.min(100, Math.max(0, parseInt(parsed.score) || 0)),
-          strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
-          weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses : [],
-          missingPoints: Array.isArray(parsed.missingPoints) ? parsed.missingPoints : [],
-          suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
-        };
-      } catch (parseErr) {
-        console.warn('Ollama JSON parse failed. Raw response:', responseText);
-        // Fallback parsing strategy to avoid crashing
-        let score = 0;
-        const scoreMatch = responseText.match(/"score"\s*:\s*(\d+)/i);
-        if (scoreMatch) {
-          score = Math.min(100, Math.max(0, parseInt(scoreMatch[1]) || 0));
-        }
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
 
-        return {
-          score: score,
-          strengths: [],
-          weaknesses: [],
-          missingPoints: ['Failed to parse structured feedback due to response format.'],
-          suggestions: [responseText.substring(0, 300)], // output snippet for debugging
-        };
-      }
-    }
-    throw new Error('Empty response from Ollama generate API');
+    const parsed = JSON.parse(responseText);
+    return {
+      score: Math.min(100, Math.max(0, parseInt(parsed.score) || 0)),
+      strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
+      weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses : [],
+      missingPoints: Array.isArray(parsed.missingPoints) ? parsed.missingPoints : [],
+      suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
+    };
   } catch (err) {
-    console.error('Error invoking Ollama LLM service:', err.message);
-    if (err.code === 'ECONNREFUSED') {
-      const offlineErr = new Error('Ollama service offline');
-      offlineErr.statusCode = 503;
-      throw offlineErr;
-    }
-    if (err.response?.status === 404) {
-      const modelErr = new Error(`LLM model '${OLLAMA_MODEL}' not found`);
-      modelErr.statusCode = 404;
-      throw modelErr;
-    }
-    if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
-      const timeoutErr = new Error('Inference request timed out');
-      timeoutErr.statusCode = 504;
-      throw timeoutErr;
-    }
+    console.error('Error invoking Gemini LLM service:', err.message);
     throw err;
   }
 }
