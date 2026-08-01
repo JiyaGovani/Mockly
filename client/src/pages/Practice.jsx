@@ -104,7 +104,7 @@ export default function Practice() {
     return (
       <div className="min-h-screen">
         <Navbar />
-        <div className="max-w-3xl mx-auto px-4 pt-24">
+        <div className="max-w-3xl mx-auto px-4 pt-10">
           <div className="glass-card p-8 animate-pulse">
             <div className="h-5 w-24 rounded-full bg-stone-200 mb-4" />
             <div className="h-6 bg-stone-200 rounded w-full mb-2" />
@@ -120,7 +120,7 @@ export default function Practice() {
     return (
       <div className="min-h-screen">
         <Navbar />
-        <div className="max-w-3xl mx-auto px-4 pt-24 text-center">
+        <div className="max-w-3xl mx-auto px-4 pt-10 text-center">
           <div className="glass-card p-8">
             <p className="text-red-400 text-lg">{error}</p>
             <button onClick={() => navigate('/questions')} className="btn-primary mt-4">
@@ -139,7 +139,7 @@ export default function Practice() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 pt-24 pb-16 page-enter">
+      <div className="max-w-4xl mx-auto px-4 pt-10 pb-16 page-enter">
         {/* Back Navigation Link */}
         <button
           onClick={() => navigate('/questions')}

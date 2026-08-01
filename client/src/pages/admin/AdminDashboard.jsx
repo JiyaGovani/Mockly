@@ -14,11 +14,11 @@ function StatCard({ label, value, icon, sub, colorClass }) {
   return (
     <div className={`glass-card p-6 space-y-3 ring-1 ${colorClass}`}>
       <div className="flex items-center justify-between">
-        <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">{label}</span>
+        <span className="text-xs text-stone-500 uppercase tracking-wider font-semibold">{label}</span>
         <span className="text-2xl">{icon}</span>
       </div>
-      <div className="text-3xl font-bold text-white tabular-nums">{value ?? '—'}</div>
-      {sub && <p className="text-xs text-slate-500">{sub}</p>}
+      <div className="text-3xl font-bold text-stone-900 tabular-nums">{value ?? '—'}</div>
+      {sub && <p className="text-xs text-stone-500">{sub}</p>}
     </div>
   );
 }
@@ -29,10 +29,10 @@ function MiniBar({ label, count, total, color }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-slate-400 capitalize">{label}</span>
-        <span className="text-slate-300 font-medium tabular-nums">{count}</span>
+        <span className="text-stone-500 capitalize">{label}</span>
+        <span className="text-stone-800 font-bold tabular-nums">{count}</span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+      <div className="h-1.5 rounded-full bg-stone-200 overflow-hidden">
         <div className={`h-full ${color} transition-all duration-700`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -43,26 +43,26 @@ function MiniBar({ label, count, total, color }) {
 function RecentUsersTable({ users }) {
   return (
     <div className="glass-card overflow-hidden">
-      <div className="px-5 py-4 border-b border-white/5">
-        <h3 className="text-sm font-semibold text-slate-200">Recent Signups</h3>
+      <div className="px-5 py-4 border-b border-stone-200 bg-white/5">
+        <h3 className="text-sm font-semibold text-stone-900">Recent Signups</h3>
       </div>
-      <div className="divide-y divide-white/5">
+      <div className="divide-y divide-stone-150">
         {users.map((u) => (
           <div key={u._id} className="flex items-center gap-3 px-5 py-3">
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-800 to-amber-600 flex items-center justify-center text-xs font-semibold text-white shrink-0">
               {u.name?.charAt(0)?.toUpperCase()}
             </div>
             <div className="min-w-0">
-              <p className="text-sm text-slate-200 font-medium truncate">{u.name}</p>
-              <p className="text-xs text-slate-500 truncate">{u.email}</p>
+              <p className="text-sm text-stone-900 font-semibold truncate">{u.name}</p>
+              <p className="text-xs text-stone-500 truncate">{u.email}</p>
             </div>
-            <span className="ml-auto text-xs text-slate-500 whitespace-nowrap">
+            <span className="ml-auto text-xs text-stone-500 whitespace-nowrap">
               {new Date(u.createdAt).toLocaleDateString()}
             </span>
           </div>
         ))}
         {users.length === 0 && (
-          <p className="px-5 py-6 text-sm text-slate-500 text-center">No users yet</p>
+          <p className="px-5 py-6 text-sm text-stone-500 text-center">No users yet</p>
         )}
       </div>
     </div>
@@ -71,7 +71,7 @@ function RecentUsersTable({ users }) {
 
 // ─── Skeleton ───
 function Skeleton({ className }) {
-  return <div className={`bg-white/5 rounded-xl animate-pulse ${className}`} />;
+  return <div className={`bg-stone-200 rounded-xl animate-pulse ${className}`} />;
 }
 
 export default function AdminDashboard() {
@@ -114,8 +114,8 @@ export default function AdminDashboard() {
       <div className="px-8 py-8 space-y-8 max-w-6xl">
         {/* Page header */}
         <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-sm text-slate-400 mt-1">Platform-wide metrics at a glance</p>
+          <h1 className="text-2xl font-bold text-stone-900">Dashboard</h1>
+          <p className="text-sm text-stone-600 mt-1">Platform-wide metrics at a glance</p>
         </div>
 
         {error && (
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
         <div className="grid md:grid-cols-3 gap-5">
           {/* Questions by type */}
           <div className="glass-card p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-slate-300">Questions by Type</h3>
+            <h3 className="text-sm font-semibold text-stone-850">Questions by Type</h3>
             {loading ? (
               <Skeleton className="h-24" />
             ) : (
@@ -186,7 +186,7 @@ export default function AdminDashboard() {
 
           {/* Questions by difficulty */}
           <div className="glass-card p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-slate-300">Questions by Difficulty</h3>
+            <h3 className="text-sm font-semibold text-stone-850">Questions by Difficulty</h3>
             {loading ? (
               <Skeleton className="h-24" />
             ) : (
@@ -206,22 +206,22 @@ export default function AdminDashboard() {
 
           {/* Quick links */}
           <div className="glass-card p-5 space-y-3">
-            <h3 className="text-sm font-semibold text-slate-300">Quick Actions</h3>
+            <h3 className="text-sm font-semibold text-stone-850">Quick Actions</h3>
             {[
-              { label: 'Manage Questions', path: '/admin/questions', icon: '❓', color: 'text-blue-400' },
-              { label: 'Manage Roles', path: '/admin/roles', icon: '🏷️', color: 'text-purple-400' },
-              { label: 'View All Users', path: '/admin/users', icon: '👥', color: 'text-teal-400' },
+              { label: 'Manage Questions', path: '/admin/questions', icon: '❓', color: 'text-blue-600' },
+              { label: 'Manage Roles', path: '/admin/roles', icon: '🏷️', color: 'text-purple-600' },
+              { label: 'View All Users', path: '/admin/users', icon: '👥', color: 'text-teal-600' },
             ].map((action) => (
               <a
                 key={action.path}
                 href={action.path}
-                className="flex items-center gap-3 p-3 rounded-xl bg-white/3 hover:bg-white/8 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-200 shadow-sm transition-all group"
               >
                 <span className={`text-lg ${action.color}`}>{action.icon}</span>
-                <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
+                <span className="text-sm text-stone-700 group-hover:text-stone-900 transition-colors">
                   {action.label}
                 </span>
-                <span className="ml-auto text-slate-600 group-hover:text-slate-400 transition-colors">→</span>
+                <span className="ml-auto text-stone-500 group-hover:text-stone-700 transition-colors">→</span>
               </a>
             ))}
           </div>

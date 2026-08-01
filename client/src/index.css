@@ -17,6 +17,10 @@
   --mockly-success: #16a34a;       /* Green 600 */
 }
 
+html {
+  overflow-y: scroll;
+}
+
 * {
   margin: 0;
   padding: 0;

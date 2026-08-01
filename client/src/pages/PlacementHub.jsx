@@ -221,8 +221,8 @@ function RoleSelector({ selected, onChange }) {
           onClick={() => onChange(r)}
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
             selected === r
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-              : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+              ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
+              : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900 border border-stone-300'
           }`}
         >
           {r}

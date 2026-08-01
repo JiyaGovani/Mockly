@@ -32,8 +32,12 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      await login({ email: form.email, password: form.password });
-      navigate('/questions', { replace: true });
+      const data = await login({ email: form.email, password: form.password });
+      if (data?.user?.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/questions', { replace: true });
+      }
     } catch (err) {
       setError(err.message || 'Login failed');
       triggerShake();

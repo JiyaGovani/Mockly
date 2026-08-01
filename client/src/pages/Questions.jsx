@@ -210,7 +210,7 @@ export default function Questions() {
   }, [activeRole, activeType, activeDifficulty, searchDebounced]);
 
   return (
-    <div className="min-h-screen relative overflow-y-scroll">
+    <div className="min-h-screen relative">
       {/* Background orbs */}
 
 
@@ -272,7 +272,7 @@ export default function Questions() {
             className="input-field w-auto min-w-[140px] text-sm py-2 px-3 cursor-pointer"
           >
             {TYPES.map((t) => (
-              <option key={t} value={t} className="bg-slate-800">
+              <option key={t} value={t} className="bg-white text-stone-700">
                 {t === 'all' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1)}
               </option>
             ))}
@@ -285,7 +285,7 @@ export default function Questions() {
             className="input-field w-auto min-w-[140px] text-sm py-2 px-3 cursor-pointer"
           >
             {DIFFICULTIES.map((d) => (
-              <option key={d} value={d} className="bg-slate-800">
+              <option key={d} value={d} className="bg-white text-stone-700">
                 {d === 'all' ? 'All Difficulties' : d.charAt(0).toUpperCase() + d.slice(1)}
               </option>
             ))}
@@ -412,25 +412,25 @@ export default function Questions() {
           <div className="glass-card relative w-full max-w-md p-6 md:p-8 page-enter" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowMockModal(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all"
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 hover:text-stone-850 transition-all"
             >
               ✕
             </button>
 
             <h2 className="text-lg font-bold text-stone-900 mb-2">Start Mock Interview</h2>
-            <p className="text-sm text-slate-400 mb-6">
+            <p className="text-sm text-stone-500 mb-6">
               10 balanced questions • 45-minute timer • AI-graded scorecard
             </p>
 
-            <label className="block text-sm font-medium text-slate-300 mb-2">Select Target Role</label>
+            <label className="block text-sm font-medium text-stone-700 mb-2">Select Target Role</label>
             <select
               value={mockRole}
               onChange={(e) => setMockRole(e.target.value)}
-              className="input-field w-full text-sm py-2.5 px-3 cursor-pointer mb-6"
+              className="input-field w-full text-sm py-2.5 px-3 cursor-pointer mb-6 animate-none"
             >
-              <option value="" className="bg-slate-800">Choose a role...</option>
+              <option value="" className="bg-white text-stone-700">Choose a role...</option>
               {roles.map((role) => (
-                <option key={role._id} value={role.name} className="bg-slate-800">
+                <option key={role._id} value={role.name} className="bg-white text-stone-700">
                   {role.displayName}
                 </option>
               ))}

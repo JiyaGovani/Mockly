@@ -198,7 +198,7 @@ export default function MockScorecard() {
 
   if (loading || !session) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
+      <div className="min-h-screen relative">
 
         <Navbar />
         <div className="flex items-center justify-center h-[80vh]">
@@ -213,7 +213,7 @@ export default function MockScorecard() {
   );
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative">
       {/* Background */}
 
 

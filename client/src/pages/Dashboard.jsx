@@ -71,7 +71,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden pb-12">
+    <div className="min-h-screen relative pb-12">
       {/* Background orbs */}
 
 

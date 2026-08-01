@@ -183,7 +183,7 @@ export default function MockInterview() {
 
   if (loading) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
+      <div className="min-h-screen relative">
 
         <Navbar />
         <div className="flex items-center justify-center h-[80vh]">
@@ -199,7 +199,7 @@ export default function MockInterview() {
   // Submitting overlay
   if (submitting) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
+      <div className="min-h-screen relative">
 
         <Navbar />
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -223,7 +223,7 @@ export default function MockInterview() {
   ).length;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative">
       {/* Background */}
 
 
