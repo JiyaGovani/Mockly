@@ -19,7 +19,7 @@ function Timer({ seconds }) {
   return (
     <div
       className={`font-mono text-lg font-bold tabular-nums ${
-        isWarning ? 'text-red-400 animate-pulse' : 'text-slate-200'
+        isWarning ? 'text-red-650 animate-pulse' : 'text-stone-800'
       }`}
     >
       {m}:{s}
@@ -113,7 +113,7 @@ export default function AptitudeWorkspace() {
             } shadow-lg`}
           >
             <div className="text-5xl">{passed ? '🎉' : '😔'}</div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-stone-900">
               Aptitude Round {passed ? 'Passed!' : 'Failed'}
             </h1>
 
@@ -131,29 +131,29 @@ export default function AptitudeWorkspace() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-3xl font-bold text-white">{score}</span>
-                  <span className="text-xs text-slate-400">/ 100</span>
+                  <span className="text-3xl font-bold text-stone-900">{score}</span>
+                  <span className="text-xs text-stone-500">/ 100</span>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white/5 rounded-xl p-3">
-                <div className="text-xl font-bold text-white">{correctCount}</div>
-                <div className="text-xs text-slate-400">Correct</div>
+              <div className="bg-stone-100 border border-stone-200 rounded-xl p-3">
+                <div className="text-xl font-bold text-stone-900">{correctCount}</div>
+                <div className="text-xs text-stone-500">Correct</div>
               </div>
-              <div className="bg-white/5 rounded-xl p-3">
-                <div className="text-xl font-bold text-white">{totalQuestions - correctCount}</div>
-                <div className="text-xs text-slate-400">Wrong</div>
+              <div className="bg-stone-100 border border-stone-200 rounded-xl p-3">
+                <div className="text-xl font-bold text-stone-900">{totalQuestions - correctCount}</div>
+                <div className="text-xs text-stone-500">Wrong</div>
               </div>
-              <div className="bg-white/5 rounded-xl p-3">
-                <div className="text-xl font-bold text-white">{totalQuestions}</div>
-                <div className="text-xs text-slate-400">Total</div>
+              <div className="bg-stone-100 border border-stone-200 rounded-xl p-3">
+                <div className="text-xl font-bold text-stone-900">{totalQuestions}</div>
+                <div className="text-xs text-stone-500">Total</div>
               </div>
             </div>
 
             {!passed && !locked && (
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-stone-500">
                 {attemptsRemaining} attempt{attemptsRemaining !== 1 ? 's' : ''} remaining (Used {attemptsUsed}/{3})
               </p>
             )}
@@ -171,7 +171,7 @@ export default function AptitudeWorkspace() {
             <button
               id="btn-back-to-placement"
               onClick={() => navigate('/placement')}
-              className="flex-1 py-3 rounded-xl bg-white/5 text-slate-300 text-sm font-medium hover:bg-white/10 transition-all"
+              className="flex-1 py-3 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-200 transition-all"
             >
               ← Back to Placement Hub
             </button>
@@ -209,17 +209,17 @@ export default function AptitudeWorkspace() {
         <aside className="w-56 shrink-0 space-y-4">
           {/* Timer */}
           <div className="glass-card p-4 flex flex-col items-center gap-1">
-            <span className="text-xs text-slate-500 uppercase tracking-wider">Time Left</span>
+            <span className="text-xs text-stone-550 uppercase tracking-wider font-semibold">Time Left</span>
             <Timer seconds={timeLeft} />
           </div>
 
           {/* Progress */}
           <div className="glass-card p-4 space-y-3">
-            <div className="flex items-center justify-between text-xs text-slate-400">
+            <div className="flex items-center justify-between text-xs text-stone-500">
               <span>Progress</span>
               <span>{answeredCount}/{questions.length}</span>
             </div>
-            <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+            <div className="h-1.5 rounded-full bg-stone-200 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-orange-500 to-amber-500 transition-all duration-300"
                 style={{ width: `${(answeredCount / questions.length) * 100}%` }}
@@ -229,7 +229,7 @@ export default function AptitudeWorkspace() {
 
           {/* Question grid nav */}
           <div className="glass-card p-4 space-y-2">
-            <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Questions</p>
+            <p className="text-xs text-stone-550 uppercase tracking-wider font-semibold mb-2">Questions</p>
             <div className="grid grid-cols-4 gap-1.5">
               {questions.map((q, idx) => (
                 <button
@@ -241,7 +241,7 @@ export default function AptitudeWorkspace() {
                       ? 'bg-orange-500 text-white shadow-md shadow-orange-500/30'
                       : answers[q._id] !== undefined
                       ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30'
-                      : 'bg-white/5 text-slate-400 hover:bg-white/10'
+                      : 'bg-stone-100 border border-stone-200 text-stone-600 hover:bg-stone-200'
                   }`}
                 >
                   {idx + 1}
@@ -266,14 +266,14 @@ export default function AptitudeWorkspace() {
           {/* Question header */}
           <div className="glass-card p-5 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 uppercase tracking-wider">
+              <span className="text-xs text-stone-500 uppercase tracking-wider">
                 Question {currentIdx + 1} of {questions.length}
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-850 font-semibold">
                 Aptitude — {role}
               </span>
             </div>
-            <p className="text-white font-medium text-lg leading-relaxed mt-2">{q.text}</p>
+            <p className="text-stone-900 font-medium text-lg leading-relaxed mt-2">{q.text}</p>
           </div>
 
           {/* MCQ Options */}
@@ -287,8 +287,8 @@ export default function AptitudeWorkspace() {
                   onClick={() => handleSelect(q._id, optIdx)}
                   className={`w-full text-left p-4 rounded-xl border transition-all duration-200 ${
                     isSelected
-                      ? 'border-orange-500/50 bg-orange-500/10 text-white shadow-md shadow-orange-500/10'
-                      : 'border-white/5 bg-white/3 text-slate-300 hover:border-white/15 hover:bg-white/8'
+                      ? 'border-orange-500/50 bg-orange-500/10 text-orange-950 shadow-md shadow-orange-500/10 font-medium'
+                      : 'border-stone-200 bg-stone-100 text-stone-700 hover:border-stone-300 hover:bg-stone-200'
                   }`}
                 >
                   <span className="flex items-center gap-3">
@@ -296,7 +296,7 @@ export default function AptitudeWorkspace() {
                       className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 transition-all ${
                         isSelected
                           ? 'border-orange-400 bg-orange-500 text-white'
-                          : 'border-white/20 text-slate-500'
+                          : 'border-stone-300 text-stone-500'
                       }`}
                     >
                       {String.fromCharCode(65 + optIdx)}
@@ -314,18 +314,18 @@ export default function AptitudeWorkspace() {
               id="btn-prev-q"
               disabled={currentIdx === 0}
               onClick={() => setCurrentIdx((i) => i - 1)}
-              className="px-5 py-2 rounded-xl text-sm text-slate-400 bg-white/5 hover:bg-white/10 disabled:opacity-30 transition-all"
+              className="px-5 py-2 rounded-xl text-sm text-stone-600 bg-stone-100 border border-stone-200 hover:bg-stone-200 disabled:opacity-30 transition-all"
             >
               ← Previous
             </button>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-stone-500">
               {answeredCount} of {questions.length} answered
             </span>
             <button
               id="btn-next-q"
               disabled={currentIdx === questions.length - 1}
               onClick={() => setCurrentIdx((i) => i + 1)}
-              className="px-5 py-2 rounded-xl text-sm text-slate-400 bg-white/5 hover:bg-white/10 disabled:opacity-30 transition-all"
+              className="px-5 py-2 rounded-xl text-sm text-stone-600 bg-stone-100 border border-stone-200 hover:bg-stone-200 disabled:opacity-30 transition-all"
             >
               Next →
             </button>

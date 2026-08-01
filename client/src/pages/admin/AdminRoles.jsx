@@ -286,7 +286,7 @@ export default function AdminRoles() {
                 ))
               ) : roles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-slate-500">
+                  <td colSpan={5} className="px-5 py-10 text-center text-stone-550">
                     No roles found. Add one above.
                   </td>
                 </tr>

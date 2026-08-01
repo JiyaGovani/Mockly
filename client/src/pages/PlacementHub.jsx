@@ -58,12 +58,12 @@ const ROUNDS = [
 // ─── Status Badge ───
 function StatusBadge({ status }) {
   const map = {
-    passed: { label: '✓ Passed', cls: 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30' },
-    failed: { label: '✗ Failed', cls: 'bg-red-500/15 text-red-400 ring-1 ring-red-500/30' },
-    locked: { label: '🔒 Locked', cls: 'bg-slate-500/15 text-slate-400 ring-1 ring-slate-500/30' },
-    active: { label: '▶ In Progress', cls: 'bg-indigo-500/15 text-indigo-400 ring-1 ring-indigo-500/30' },
-    unlocked: { label: '○ Not Started', cls: 'bg-white/5 text-slate-500 ring-1 ring-white/10' },
-    gated: { label: '🔐 Locked', cls: 'bg-slate-600/15 text-slate-500 ring-1 ring-slate-600/20' },
+    passed: { label: '✓ Passed', cls: 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200' },
+    failed: { label: '✗ Failed', cls: 'bg-red-100 text-red-800 ring-1 ring-red-200' },
+    locked: { label: '🔒 Locked', cls: 'bg-stone-200 text-stone-600 ring-1 ring-stone-300' },
+    active: { label: '▶ In Progress', cls: 'bg-indigo-100 text-indigo-800 ring-1 ring-indigo-200' },
+    unlocked: { label: '○ Not Started', cls: 'bg-stone-100 text-stone-600 ring-1 ring-stone-200' },
+    gated: { label: '🔐 Locked', cls: 'bg-stone-200 text-stone-600 ring-1 ring-stone-300' },
   };
   const { label, cls } = map[status] || map.gated;
   return (
@@ -85,7 +85,7 @@ function AttemptPips({ used, max }) {
           }`}
         />
       ))}
-      <span className="text-xs text-slate-500 ml-1">
+      <span className="text-xs text-stone-500 ml-1">
         {max - used} attempt{max - used !== 1 ? 's' : ''} left
       </span>
     </div>
@@ -117,7 +117,7 @@ function ScoreRing({ score, color }) {
           </linearGradient>
         </defs>
       </svg>
-      <span className="absolute text-sm font-bold text-white">{pct}</span>
+      <span className="absolute text-sm font-bold text-stone-900">{pct}</span>
     </div>
   );
 }
@@ -184,13 +184,13 @@ function RoundCard({ round, roundData, isUnlocked, onStart, loading }) {
         onClick={() => onStart(round.key)}
         className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
           passed
-            ? 'bg-emerald-500/15 text-emerald-400 cursor-default'
+            ? 'bg-emerald-100 text-emerald-800 cursor-default'
             : locked
-            ? 'bg-slate-500/10 text-slate-600 cursor-not-allowed'
+            ? 'bg-stone-200 text-stone-600 cursor-not-allowed'
             : !isUnlocked
-            ? 'bg-white/5 text-slate-600 cursor-not-allowed'
+            ? 'bg-stone-100 text-stone-600 cursor-not-allowed border border-stone-200'
             : loading
-            ? 'bg-indigo-600/50 text-indigo-300 cursor-wait'
+            ? 'bg-amber-900/50 text-white cursor-wait'
             : `bg-gradient-to-r ${round.color} text-white hover:opacity-90 hover:scale-[1.02] shadow-lg`
         }`}
       >
@@ -237,11 +237,11 @@ function PlacementCompleteBanner({ role }) {
   return (
     <div className="glass-card p-8 text-center space-y-4 ring-1 ring-emerald-500/30 shadow-lg shadow-emerald-500/10">
       <div className="text-5xl">🎉</div>
-      <h2 className="text-2xl font-bold text-white">Placement Simulation Complete!</h2>
-      <p className="text-slate-400">
-        You successfully cleared all 3 rounds of the <span className="text-white font-medium">{role}</span> placement simulation.
+      <h2 className="text-2xl font-bold text-stone-900">Placement Simulation Complete!</h2>
+      <p className="text-stone-650">
+        You successfully cleared all 3 rounds of the <span className="text-stone-900 font-bold">{role}</span> placement simulation.
       </p>
-      <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30">
+      <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-850 ring-1 ring-emerald-250">
         ✓ All Rounds Passed
       </span>
     </div>
@@ -357,7 +357,7 @@ export default function PlacementHub() {
                 }}
               />
             </div>
-            <span className="text-xs text-slate-400 whitespace-nowrap">
+            <span className="text-xs text-stone-500 whitespace-nowrap">
               {allPassed ? '3/3' : technicalPassed ? '2/3' : aptitudePassed ? '1/3' : '0/3'} rounds cleared
             </span>
           </div>
@@ -365,7 +365,7 @@ export default function PlacementHub() {
 
         {/* Role Selector */}
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Target Role</h2>
+          <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider">Target Role</h2>
           <RoleSelector selected={selectedRole} onChange={handleRoleChange} />
         </div>
 
@@ -415,15 +415,15 @@ export default function PlacementHub() {
             <ul className="space-y-1.5 text-sm text-stone-600">
               <li className="flex items-start gap-2">
                 <span className="text-orange-400 mt-0.5">①</span>
-                <span><span className="text-orange-300 font-medium">Aptitude</span> — Answer 10 MCQs. Score ≥ 70% to advance.</span>
+                <span><span className="text-amber-900 font-bold">Aptitude</span> — Answer 10 MCQs. Score ≥ 70% to advance.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-400 mt-0.5">②</span>
-                <span><span className="text-blue-300 font-medium">Technical</span> — 10 subjective questions graded by hybrid AI. Score ≥ 75%.</span>
+                <span><span className="text-blue-700 font-bold">Technical</span> — 10 subjective questions graded by hybrid AI. Score ≥ 75%.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-teal-400 mt-0.5">③</span>
-                <span><span className="text-teal-300 font-medium">HR</span> — Behavioral questions with LLM-heavy evaluation. Score ≥ 70%.</span>
+                <span><span className="text-teal-700 font-bold">HR</span> — Behavioral questions with LLM-heavy evaluation. Score ≥ 70%.</span>
               </li>
               <li className="flex items-start gap-2 mt-1">
                 <span className="text-red-400 mt-0.5">⚠</span>

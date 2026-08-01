@@ -11,7 +11,7 @@ api.interceptors.request.use((config) => {
 
 function ScoreBadge({ score }) {
   if (score === null || score === undefined) {
-    return <span className="text-xs text-slate-600">—</span>;
+    return <span className="text-xs text-stone-600">—</span>;
   }
   const color =
     score >= 75 ? 'bg-emerald-100 text-emerald-800' :
@@ -117,7 +117,7 @@ export default function AdminUsers() {
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-slate-500">
+                  <td colSpan={5} className="px-5 py-10 text-center text-stone-550">
                     {search ? 'No users match your search' : 'No users found'}
                   </td>
                 </tr>
@@ -144,7 +144,7 @@ export default function AdminUsers() {
                     <td className="px-5 py-3 text-right">
                       <ScoreBadge score={u.avgScore} />
                     </td>
-                    <td className="px-5 py-3 text-right text-slate-500 text-xs">
+                    <td className="px-5 py-3 text-right text-stone-500 text-xs">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

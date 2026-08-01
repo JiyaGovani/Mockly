@@ -229,15 +229,15 @@ export default function Practice() {
                   className="input-field resize-y min-h-[200px] text-sm leading-relaxed"
                 />
                 <div className="flex items-center justify-between mt-3">
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-stone-500">
                     {userAnswer.trim().split(/\s+/).filter(Boolean).length} words
                   </span>
-                  {error && <span className="text-xs text-red-400">{error}</span>}
+                  {error && <span className="text-xs text-red-750 font-medium">{error}</span>}
                 </div>
               </>
             )}
 
-            {error && hasOptions && <p className="text-xs text-red-400 mt-3">{error}</p>}
+            {error && hasOptions && <p className="text-xs text-red-750 font-medium mt-3">{error}</p>}
 
             {/* Submit Button */}
             <button

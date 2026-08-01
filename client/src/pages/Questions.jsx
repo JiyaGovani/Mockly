@@ -221,7 +221,7 @@ export default function Questions() {
         <div className="mb-6 flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-stone-900">Question Bank</h1>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-stone-500 text-sm mt-1">
               Browse interview questions by role, type, and difficulty
             </p>
           </div>
@@ -304,7 +304,7 @@ export default function Questions() {
         </div>
 
         {/* Results count */}
-        <p className="text-xs text-slate-500 mb-4">
+        <p className="text-xs text-stone-500 mb-4">
           {loading ? 'Loading…' : `${pagination.total} question${pagination.total !== 1 ? 's' : ''} found`}
         </p>
 
@@ -323,7 +323,7 @@ export default function Questions() {
               <h3 className="text-lg font-semibold text-stone-600 mb-2">
                 No questions found
               </h3>
-              <p className="text-slate-500 text-sm">
+              <p className="text-stone-500 text-sm">
                 Try adjusting your filters or search term
               </p>
             </div>
@@ -381,17 +381,17 @@ export default function Questions() {
             <button
               onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}
               disabled={pagination.page <= 1}
-              className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-sm border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               ← Prev
             </button>
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-stone-500">
               Page {pagination.page} of {pagination.pages}
             </span>
             <button
               onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
               disabled={pagination.page >= pagination.pages}
-              className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-sm border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               Next →
             </button>

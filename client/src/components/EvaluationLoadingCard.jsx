@@ -48,12 +48,12 @@ export default function EvaluationLoadingCard({ currentStep }) {
               i < currentStep
                 ? 'bg-emerald-500/10 border border-emerald-500/20'
                 : i === currentStep
-                ? 'bg-indigo-500/10 border border-indigo-500/30 animate-pulse'
-                : 'bg-white/5 border border-white/10 opacity-40'
+                ? 'bg-amber-900/10 border border-amber-900/25 animate-pulse'
+                : 'bg-stone-100 border border-stone-200 opacity-40'
             }`}
           >
             <span className="text-lg">{i < currentStep ? '✅' : step.icon}</span>
-            <span className={`text-sm ${i <= currentStep ? 'text-slate-200' : 'text-slate-500'}`}>
+            <span className={`text-sm ${i <= currentStep ? 'text-stone-900 font-semibold' : 'text-stone-500'}`}>
               {step.label}
             </span>
           </div>
@@ -61,8 +61,8 @@ export default function EvaluationLoadingCard({ currentStep }) {
       </div>
 
       {/* Rotating Tips */}
-      <div className="bg-indigo-500/10 rounded-xl p-4 border border-indigo-500/20">
-        <p className="text-sm text-indigo-300 transition-all duration-500" key={tipIndex}>
+      <div className="bg-amber-900/10 rounded-xl p-4 border border-amber-900/20">
+        <p className="text-sm text-amber-950 font-medium transition-all duration-500" key={tipIndex}>
           {TIPS[tipIndex]}
         </p>
       </div>

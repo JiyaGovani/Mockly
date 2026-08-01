@@ -496,7 +496,7 @@ export default function AdminQuestions() {
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-slate-500">
+                  <td colSpan={6} className="px-5 py-10 text-center text-stone-550">
                     No questions found
                   </td>
                 </tr>
