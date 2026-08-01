@@ -268,7 +268,7 @@ export default function MockScorecard() {
         <div className="mt-10 text-center">
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+            className="px-6 py-3 rounded-lg bg-gradient-to-r from-amber-900 to-amber-700 text-white font-medium shadow-lg shadow-amber-900/25 hover:shadow-amber-900/40 transition-all"
           >
             View Dashboard
           </button>

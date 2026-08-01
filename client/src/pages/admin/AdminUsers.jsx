@@ -126,7 +126,7 @@ export default function AdminUsers() {
                   <tr key={u._id} className="hover:bg-white/3 transition-colors">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-800 to-amber-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
                           {u.name?.charAt(0)?.toUpperCase()}
                         </div>
                         <div>

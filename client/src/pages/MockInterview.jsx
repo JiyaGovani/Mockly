@@ -395,7 +395,7 @@ export default function MockInterview() {
               {currentIdx < session.questions.length - 1 ? (
                 <button
                   onClick={() => goToQuestion(currentIdx + 1)}
-                  className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+                  className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-medium shadow-lg shadow-amber-900/25 hover:shadow-amber-900/40 transition-all"
                 >
                   Next →
                 </button>

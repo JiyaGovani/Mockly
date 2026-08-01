@@ -73,7 +73,7 @@ function AddRoleForm({ onSaved }) {
           id="btn-add-role"
           type="submit"
           disabled={saving}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
+          className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
         >
           {saving ? 'Adding…' : '+ Add Role'}
         </button>

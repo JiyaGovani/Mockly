@@ -126,7 +126,7 @@ function QuestionModal({ question, onClose, onSaved }) {
                   className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
                 >
                   {options.map((o) => (
-                    <option key={o} value={o} className="bg-slate-900">
+                    <option key={o} value={o} className="bg-white">
                       {o}
                     </option>
                   ))}
@@ -214,7 +214,7 @@ function QuestionModal({ question, onClose, onSaved }) {
               id="btn-save-question"
               type="submit"
               disabled={saving}
-              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
             >
               {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Question'}
             </button>
@@ -337,7 +337,7 @@ function BulkImportPanel({ onImported }) {
           id="btn-bulk-import"
           onClick={handleImport}
           disabled={!preview || importing}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-30"
+          className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-30"
         >
           {importing ? 'Importing…' : `Import ${preview ? preview.length : ''} Questions`}
         </button>
@@ -425,7 +425,7 @@ export default function AdminQuestions() {
             <button
               id="btn-add-question"
               onClick={() => setEditQ({})}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold hover:opacity-90 transition-all shadow-md shadow-indigo-500/20"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-semibold hover:opacity-90 transition-all shadow-md shadow-amber-900/20"
             >
               + Add Question
             </button>
@@ -451,7 +451,7 @@ export default function AdminQuestions() {
             className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
           >
             <option value="">All Types</option>
-            {TYPES.map((t) => <option key={t} value={t} className="bg-slate-900">{t}</option>)}
+            {TYPES.map((t) => <option key={t} value={t} className="bg-white">{t}</option>)}
           </select>
           <select
             id="q-filter-diff"
@@ -460,7 +460,7 @@ export default function AdminQuestions() {
             className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
           >
             <option value="">All Difficulties</option>
-            {DIFFICULTIES.map((d) => <option key={d} value={d} className="bg-slate-900">{d}</option>)}
+            {DIFFICULTIES.map((d) => <option key={d} value={d} className="bg-white">{d}</option>)}
           </select>
         </div>
 

@@ -91,15 +91,15 @@ export default function Dashboard() {
           </div>
           
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400 font-medium">Time Range:</span>
+            <span className="text-sm text-stone-500 font-medium">Time Range:</span>
             <select
               value={range}
               onChange={handleRangeChange}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer"
+              className="bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm text-stone-700 focus:outline-none focus:border-amber-800 transition-all cursor-pointer"
             >
-              <option value="7days" className="bg-slate-900 text-slate-300">Last 7 Days</option>
-              <option value="30days" className="bg-slate-900 text-slate-300">Last 30 Days</option>
-              <option value="all" className="bg-slate-900 text-slate-300">All-Time</option>
+              <option value="7days" className="bg-white text-stone-700">Last 7 Days</option>
+              <option value="30days" className="bg-white text-stone-700">Last 30 Days</option>
+              <option value="all" className="bg-white text-stone-700">All-Time</option>
             </select>
           </div>
         </div>

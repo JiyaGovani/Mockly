@@ -331,7 +331,7 @@ export default function PlacementHub() {
   const allPassed = attempt?.status === 'passed';
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-stone-50">
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
@@ -351,7 +351,7 @@ export default function PlacementHub() {
           <div className="mt-4 flex items-center gap-3">
             <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-700"
+                className="h-full bg-gradient-to-r from-amber-900 to-amber-700 transition-all duration-700"
                 style={{
                   width: allPassed ? '100%' : technicalPassed ? '66%' : aptitudePassed ? '33%' : '0%',
                 }}

@@ -243,7 +243,7 @@ export default function Questions() {
             onClick={() => setActiveRole('all')}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
               activeRole === 'all'
-                ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
+                ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
                 : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300 border border-white/10'
             }`}
           >
@@ -255,7 +255,7 @@ export default function Questions() {
               onClick={() => setActiveRole(role.name)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
                 activeRole === role.name
-                  ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
+                  ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
                   : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300 border border-white/10'
               }`}
             >

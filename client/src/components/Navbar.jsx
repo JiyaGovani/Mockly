@@ -20,10 +20,10 @@ export default function Navbar() {
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => navigate('/questions')}
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-500/20">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-800 to-amber-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-amber-900/20">
               M
             </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+            <span className="text-lg font-bold bg-gradient-to-r from-amber-900 to-amber-700 bg-clip-text text-transparent">
               Mockly
             </span>
           </div>
@@ -32,19 +32,19 @@ export default function Navbar() {
             <div className="hidden sm:flex items-center gap-4">
               <button
                 onClick={() => navigate('/questions')}
-                className="text-sm text-slate-400 hover:text-slate-100 font-medium transition-all duration-300"
+                className="text-sm text-stone-500 hover:text-stone-800 font-medium transition-all duration-300"
               >
                 Questions
               </button>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="text-sm text-slate-400 hover:text-slate-100 font-medium transition-all duration-300"
+                className="text-sm text-stone-500 hover:text-stone-800 font-medium transition-all duration-300"
               >
                 Dashboard
               </button>
               <button
                 onClick={() => navigate('/placement')}
-                className="text-sm text-slate-400 hover:text-slate-100 font-medium transition-all duration-300"
+                className="text-sm text-stone-500 hover:text-stone-800 font-medium transition-all duration-300"
               >
                 Placement
               </button>
@@ -55,16 +55,16 @@ export default function Navbar() {
         {/* User */}
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-xs font-semibold text-white">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-800 to-amber-600 flex items-center justify-center text-xs font-semibold text-white">
               {user?.name?.charAt(0)?.toUpperCase() || '?'}
             </div>
-            <span className="text-sm text-slate-300 font-medium">
+            <span className="text-sm text-stone-700 font-medium">
               {user?.name}
             </span>
           </div>
           <button
             onClick={handleLogout}
-            className="px-3 py-1.5 rounded-lg border border-slate-600 text-slate-400 text-xs font-medium hover:bg-white/5 hover:border-slate-500 hover:text-slate-300 transition-all duration-300"
+            className="px-3 py-1.5 rounded-lg border border-stone-300 text-stone-500 text-xs font-medium hover:bg-stone-100 hover:border-stone-400 hover:text-stone-700 transition-all duration-300"
           >
             Sign Out
           </button>
