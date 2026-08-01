@@ -25,7 +25,7 @@ export default function ScoreRing({ score, size = 120, stroke = 8, label }) {
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="rgba(255,255,255,0.1)"
+            stroke="rgba(0,0,0,0.06)"
             strokeWidth={stroke}
           />
           <circle
@@ -42,10 +42,10 @@ export default function ScoreRing({ score, size = 120, stroke = 8, label }) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold text-slate-100">{score}</span>
+          <span className="text-2xl font-bold text-stone-900">{score}</span>
         </div>
       </div>
-      {label && <span className="text-xs text-slate-400 font-medium">{label}</span>}
+      {label && <span className="text-xs text-stone-600 font-semibold">{label}</span>}
     </div>
   );
 }

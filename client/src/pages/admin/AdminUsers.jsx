@@ -11,14 +11,14 @@ api.interceptors.request.use((config) => {
 
 function ScoreBadge({ score }) {
   if (score === null || score === undefined) {
-    return <span className="text-xs text-slate-600">—</span>;
+    return <span className="text-xs text-stone-600">—</span>;
   }
   const color =
-    score >= 75 ? 'bg-emerald-500/15 text-emerald-400' :
-    score >= 50 ? 'bg-amber-500/15 text-amber-400' :
-    'bg-red-500/15 text-red-400';
+    score >= 75 ? 'bg-emerald-100 text-emerald-800' :
+    score >= 50 ? 'bg-amber-100 text-amber-850' :
+    'bg-red-100 text-red-850';
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${color}`}>
       {score}%
     </span>
   );
@@ -26,10 +26,10 @@ function ScoreBadge({ score }) {
 
 function RoleBadge({ role }) {
   const cls = role === 'admin'
-    ? 'bg-violet-500/15 text-violet-400'
-    : 'bg-slate-500/15 text-slate-400';
+    ? 'bg-amber-900/10 text-amber-900 ring-1 ring-amber-900/25'
+    : 'bg-stone-150 text-stone-700 border border-stone-200';
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${cls}`}>
       {role}
     </span>
   );
@@ -70,8 +70,8 @@ export default function AdminUsers() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">Users</h1>
-            <p className="text-sm text-slate-400 mt-1">
+            <h1 className="text-2xl font-bold text-stone-900">Users</h1>
+            <p className="text-sm text-stone-600 mt-1">
               {users.length} total user{users.length !== 1 ? 's' : ''} registered
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function AdminUsers() {
             placeholder="Search by name or email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 w-64"
+            className="px-4 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 w-64 shadow-sm"
           />
         </div>
 
@@ -96,7 +96,7 @@ export default function AdminUsers() {
         <div className="glass-card overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5 text-xs text-slate-500 uppercase tracking-wider">
+              <tr className="border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">
                 <th className="text-left px-5 py-3 font-medium">User</th>
                 <th className="text-left px-5 py-3 font-medium">Role</th>
                 <th className="text-right px-5 py-3 font-medium">Attempts</th>
@@ -104,47 +104,47 @@ export default function AdminUsers() {
                 <th className="text-right px-5 py-3 font-medium">Joined</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-stone-150">
               {loading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i}>
                     {Array.from({ length: 5 }).map((_, j) => (
                       <td key={j} className="px-5 py-4">
-                        <div className="h-4 bg-white/5 rounded animate-pulse" />
+                        <div className="h-4 bg-stone-150 rounded animate-pulse" />
                       </td>
                     ))}
                   </tr>
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-slate-500">
+                  <td colSpan={5} className="px-5 py-10 text-center text-stone-550">
                     {search ? 'No users match your search' : 'No users found'}
                   </td>
                 </tr>
               ) : (
                 filtered.map((u) => (
-                  <tr key={u._id} className="hover:bg-white/3 transition-colors">
+                  <tr key={u._id} className="hover:bg-stone-100/50 transition-colors">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-800 to-amber-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
                           {u.name?.charAt(0)?.toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-slate-200 font-medium">{u.name}</p>
-                          <p className="text-xs text-slate-500">{u.email}</p>
+                          <p className="text-stone-900 font-medium">{u.name}</p>
+                          <p className="text-xs text-stone-500">{u.email}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-5 py-3">
                       <RoleBadge role={u.role} />
                     </td>
-                    <td className="px-5 py-3 text-right text-slate-300 tabular-nums">
+                    <td className="px-5 py-3 text-right text-stone-700 tabular-nums">
                       {u.totalAttempts}
                     </td>
                     <td className="px-5 py-3 text-right">
                       <ScoreBadge score={u.avgScore} />
                     </td>
-                    <td className="px-5 py-3 text-right text-slate-500 text-xs">
+                    <td className="px-5 py-3 text-right text-stone-500 text-xs">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

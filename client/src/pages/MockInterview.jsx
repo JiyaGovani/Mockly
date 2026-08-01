@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 
@@ -32,6 +32,7 @@ function formatTime(totalSeconds) {
 export default function MockInterview() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -161,9 +162,17 @@ export default function MockInterview() {
       }));
       await api.put(`/sessions/${session._id}/save`, { answers: payload });
 
-      // Submit for evaluation
-      await api.post(`/sessions/${session._id}/submit`);
-      navigate(`/mock/scorecard/${session._id}`);
+      // Submit for evaluation depending on whether it is a placement round simulation
+      if (state?.placementRound && state?.placementRole) {
+        if (state.placementRound === 'technical') {
+          await api.post('/placement/technical/submit', { role: state.placementRole });
+        } else if (state.placementRound === 'hr') {
+          await api.post('/placement/hr/submit', { role: state.placementRole });
+        }
+      } else {
+        await api.post(`/sessions/${session._id}/submit`);
+      }
+      navigate(`/mock/scorecard/${session._id}`, { state });
     } catch (err) {
       console.error('Submit failed:', err);
       setSubmitting(false);
@@ -183,13 +192,13 @@ export default function MockInterview() {
 
   if (loading) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
-        <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
+      <div className="min-h-screen relative">
+
         <Navbar />
         <div className="flex items-center justify-center h-[80vh]">
           <div className="text-center">
             <div className="spinner mx-auto mb-4" style={{ width: '3rem', height: '3rem' }} />
-            <p className="text-slate-400">Loading interview session...</p>
+            <p className="text-stone-500">Loading interview session...</p>
           </div>
         </div>
       </div>
@@ -199,14 +208,14 @@ export default function MockInterview() {
   // Submitting overlay
   if (submitting) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
-        <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
+      <div className="min-h-screen relative">
+
         <Navbar />
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="glass-card p-10 text-center max-w-md">
             <div className="spinner mx-auto mb-6" style={{ width: '3rem', height: '3rem' }} />
-            <h2 className="text-xl font-bold text-slate-100 mb-2">Evaluating Your Answers</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-xl font-bold text-stone-800 mb-2">Evaluating Your Answers</h2>
+            <p className="text-stone-500 text-sm">
               AI is analyzing your responses. This may take a moment as each answer is evaluated
               for keywords, semantic similarity, and LLM scoring...
             </p>
@@ -223,10 +232,9 @@ export default function MockInterview() {
   ).length;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative">
       {/* Background */}
-      <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
-      <div className="bg-orb w-72 h-72 bg-violet-600 bottom-[10%] right-[-3%]" style={{ animationDelay: '3s' }} />
+
 
       <Navbar />
 
@@ -234,11 +242,11 @@ export default function MockInterview() {
         {/* ─── LEFT SIDEBAR ─── */}
         <aside className="w-64 flex-shrink-0 border-r border-white/10 bg-white/[0.02] backdrop-blur-sm flex flex-col">
           {/* Session title */}
-          <div className="p-4 border-b border-white/10">
-            <h2 className="text-sm font-bold text-slate-200 tracking-wide uppercase">
+          <div className="p-4 border-b border-stone-200">
+            <h2 className="text-sm font-bold text-stone-900 tracking-wide uppercase">
               Mock Interview
             </h2>
-            <p className="text-xs text-slate-500 mt-1">{session.role} • {session.questions.length} Questions</p>
+            <p className="text-xs text-stone-650 mt-1">{session.role} • {session.questions.length} Questions</p>
           </div>
 
           {/* Question tabs */}
@@ -253,24 +261,24 @@ export default function MockInterview() {
                   onClick={() => goToQuestion(idx)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm transition-all duration-200 ${
                     isActive
-                      ? 'bg-indigo-500/20 border border-indigo-500/40 text-slate-100'
-                      : 'hover:bg-white/5 text-slate-400 hover:text-slate-300'
+                      ? 'bg-amber-900/10 border border-amber-900/20 text-stone-900 font-semibold'
+                      : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
                   }`}
                 >
                   {/* Status dot */}
                   <span
                     className={`w-3 h-3 rounded-full flex-shrink-0 transition-all ${
                       isActive
-                        ? 'bg-indigo-500 shadow-lg shadow-indigo-500/50'
+                        ? 'bg-amber-900 shadow-lg shadow-amber-900/50'
                         : isAnswered
                         ? 'bg-emerald-500'
-                        : 'border-2 border-slate-600'
+                        : 'border-2 border-stone-400'
                     }`}
                   />
                   <span className="truncate">Q{idx + 1}</span>
                   <span
                     className={`text-xs ml-auto ${
-                      isActive ? 'text-indigo-300' : 'text-slate-600'
+                      isActive ? 'text-amber-900 font-semibold' : 'text-stone-500'
                     }`}
                   >
                     {q.type && q.type.charAt(0).toUpperCase() + q.type.slice(1, 4)}
@@ -281,16 +289,16 @@ export default function MockInterview() {
           </div>
 
           {/* Timer */}
-          <div className={`p-4 border-t border-white/10 text-center ${
+          <div className={`p-4 border-t border-stone-200 text-center ${
             isWarning ? 'animate-pulse' : ''
           }`}>
-            <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Time Remaining</p>
+            <p className="text-xs text-stone-500 uppercase tracking-wider mb-1">Time Remaining</p>
             <p className={`text-3xl font-mono font-bold tracking-wider ${
-              isWarning ? 'text-red-400' : 'text-slate-200'
+              isWarning ? 'text-red-650' : 'text-stone-900'
             }`}>
               {formatTime(remaining)}
             </p>
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-xs text-stone-550 mt-2">
               {answeredCount}/{session.questions.length} answered
             </p>
           </div>
@@ -303,7 +311,7 @@ export default function MockInterview() {
             <div className="glass-card p-6 md:p-8 max-w-4xl mx-auto">
               {/* Header badges */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="text-sm font-semibold text-slate-300">
+                <span className="text-sm font-semibold text-stone-600">
                   Question {currentIdx + 1} of {session.questions.length}
                 </span>
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -319,7 +327,7 @@ export default function MockInterview() {
               </div>
 
               {/* Question text */}
-              <h3 className="text-lg md:text-xl font-semibold text-slate-100 leading-relaxed mb-6">
+              <h3 className="text-lg md:text-xl font-semibold text-stone-900 leading-relaxed mb-6">
                 {currentQuestion.text}
               </h3>
 
@@ -339,12 +347,12 @@ export default function MockInterview() {
                         onClick={() => handleAnswerChange(opt)}
                         className={`flex items-center gap-3 p-4 rounded-xl text-left border transition-all ${
                           isSelected
-                            ? 'bg-indigo-500/20 border-indigo-500 text-slate-100 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500'
-                            : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                            ? 'bg-amber-900/10 border-amber-900 text-stone-900 shadow-lg shadow-amber-900/10 ring-1 ring-amber-900 font-semibold'
+                            : 'bg-stone-100 border-stone-200 text-stone-700 hover:bg-stone-200 hover:border-stone-300'
                         }`}
                       >
                         <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
-                          isSelected ? 'bg-indigo-500 text-white' : 'bg-white/10 text-slate-400'
+                          isSelected ? 'bg-amber-900 text-white' : 'bg-stone-200 text-stone-600'
                         }`}>
                           {letter}
                         </span>
@@ -360,20 +368,20 @@ export default function MockInterview() {
                   onChange={(e) => handleAnswerChange(e.target.value)}
                   placeholder="Type your answer here..."
                   rows={10}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/25 resize-none text-sm leading-relaxed transition-all"
+                  className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-stone-850 placeholder-stone-400 focus:outline-none focus:border-amber-900/50 focus:ring-1 focus:ring-amber-900/25 resize-none text-sm leading-relaxed transition-all shadow-sm"
                 />
               )}
             </div>
           </div>
 
           {/* Action bar */}
-          <div className="border-t border-white/10 bg-white/[0.02] backdrop-blur-sm px-6 py-4">
+          <div className="border-t border-stone-200 bg-white/60 backdrop-blur-sm px-6 py-4">
             <div className="max-w-4xl mx-auto flex items-center justify-between">
               {/* Previous */}
               <button
                 onClick={() => goToQuestion(Math.max(0, currentIdx - 1))}
                 disabled={currentIdx === 0}
-                className="px-4 py-2.5 rounded-lg bg-white/5 text-slate-400 text-sm border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="px-4 py-2.5 rounded-lg bg-stone-100 text-stone-600 text-sm border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 ← Previous
               </button>
@@ -381,11 +389,11 @@ export default function MockInterview() {
               {/* Save indicator */}
               <div className="flex items-center gap-3">
                 {saving && (
-                  <span className="text-xs text-indigo-400 animate-pulse">Saving...</span>
+                  <span className="text-xs text-amber-900 animate-pulse">Saving...</span>
                 )}
                 <button
                   onClick={saveAnswers}
-                  className="px-4 py-2.5 rounded-lg bg-white/5 text-slate-300 text-sm border border-white/10 hover:bg-white/10 transition-all"
+                  className="px-4 py-2.5 rounded-lg bg-stone-100 text-stone-600 text-sm border border-stone-200 hover:bg-stone-200 transition-all"
                 >
                   Save Progress
                 </button>
@@ -395,7 +403,7 @@ export default function MockInterview() {
               {currentIdx < session.questions.length - 1 ? (
                 <button
                   onClick={() => goToQuestion(currentIdx + 1)}
-                  className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+                  className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-medium shadow-lg shadow-amber-900/25 hover:shadow-amber-900/40 transition-all"
                 >
                   Next →
                 </button>

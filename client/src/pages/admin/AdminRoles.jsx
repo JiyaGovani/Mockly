@@ -36,7 +36,7 @@ function AddRoleForm({ onSaved }) {
 
   return (
     <div className="glass-card p-5 space-y-4">
-      <h3 className="text-sm font-semibold text-slate-300">Add New Role</h3>
+      <h3 className="text-sm font-semibold text-stone-800">Add New Role</h3>
       {error && (
         <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
           {error}
@@ -50,7 +50,7 @@ function AddRoleForm({ onSaved }) {
           placeholder="Name (e.g. SDE)"
           value={form.name}
           onChange={(e) => set('name', e.target.value)}
-          className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+          className="px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 shadow-sm"
         />
         <input
           id="role-display-name"
@@ -59,7 +59,7 @@ function AddRoleForm({ onSaved }) {
           placeholder="Display Name (e.g. Software Dev)"
           value={form.displayName}
           onChange={(e) => set('displayName', e.target.value)}
-          className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+          className="px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 shadow-sm"
         />
         <input
           id="role-description"
@@ -67,13 +67,13 @@ function AddRoleForm({ onSaved }) {
           placeholder="Description (optional)"
           value={form.description}
           onChange={(e) => set('description', e.target.value)}
-          className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+          className="px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 shadow-sm"
         />
         <button
           id="btn-add-role"
           type="submit"
           disabled={saving}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
+          className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
         >
           {saving ? 'Adding…' : '+ Add Role'}
         </button>
@@ -140,9 +140,9 @@ function RoleRow({ role, onUpdated, onDeleted }) {
   };
 
   return (
-    <tr className="hover:bg-white/3 transition-colors">
+    <tr className="hover:bg-stone-100/50 transition-colors">
       <td className="px-5 py-3">
-        <span className="font-mono text-sm font-semibold text-indigo-300">{role.name}</span>
+        <span className="font-mono text-sm font-semibold text-amber-900">{role.name}</span>
       </td>
       <td className="px-4 py-3">
         {editing ? (
@@ -151,10 +151,10 @@ function RoleRow({ role, onUpdated, onDeleted }) {
             type="text"
             value={form.displayName}
             onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
-            className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 w-full"
+            className="px-2 py-1 rounded-lg bg-white border border-stone-200 text-sm text-stone-850 focus:outline-none focus:ring-1 focus:ring-amber-900/50 w-full"
           />
         ) : (
-          <span className="text-sm text-slate-300">{role.displayName}</span>
+          <span className="text-sm text-stone-800">{role.displayName}</span>
         )}
       </td>
       <td className="px-4 py-3">
@@ -164,10 +164,10 @@ function RoleRow({ role, onUpdated, onDeleted }) {
             type="text"
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 w-full"
+            className="px-2 py-1 rounded-lg bg-white border border-stone-200 text-sm text-stone-855 focus:outline-none focus:ring-1 focus:ring-amber-900/50 w-full"
           />
         ) : (
-          <span className="text-sm text-slate-500">{role.description || '—'}</span>
+          <span className="text-sm text-stone-600">{role.description || '—'}</span>
         )}
       </td>
       <td className="px-4 py-3">
@@ -183,7 +183,7 @@ function RoleRow({ role, onUpdated, onDeleted }) {
             <button
               id={`btn-cancel-role-${role._id}`}
               onClick={() => { setEditing(false); setForm({ displayName: role.displayName, description: role.description }); }}
-              className="text-xs px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 hover:bg-white/10 transition-all"
+              className="text-xs px-3 py-1.5 rounded-lg bg-stone-100 border border-stone-200 text-stone-600 hover:bg-stone-200 transition-all"
             >
               Cancel
             </button>
@@ -191,7 +191,7 @@ function RoleRow({ role, onUpdated, onDeleted }) {
               id={`btn-save-role-${role._id}`}
               disabled={saving}
               onClick={handleSave}
-              className="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-all disabled:opacity-50"
+              className="text-xs px-3 py-1.5 rounded-lg bg-amber-900 text-white hover:bg-amber-800 transition-all disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>
@@ -201,7 +201,7 @@ function RoleRow({ role, onUpdated, onDeleted }) {
             <button
               id={`btn-edit-role-${role._id}`}
               onClick={() => setEditing(true)}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all"
+              className="p-1.5 rounded-lg text-stone-500 hover:text-amber-950 hover:bg-amber-900/10 transition-all"
               title="Edit"
             >
               ✏️
@@ -209,7 +209,7 @@ function RoleRow({ role, onUpdated, onDeleted }) {
             <button
               id={`btn-delete-role-${role._id}`}
               onClick={handleDelete}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+              className="p-1.5 rounded-lg text-stone-500 hover:text-red-650 hover:bg-red-500/10 transition-all"
               title="Delete"
             >
               🗑️
@@ -246,8 +246,8 @@ export default function AdminRoles() {
       <div className="px-8 py-8 space-y-6 max-w-4xl">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-white">Roles</h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-stone-900">Roles</h1>
+          <p className="text-sm text-stone-600 mt-1">
             Manage target roles available in the platform
           </p>
         </div>
@@ -265,7 +265,7 @@ export default function AdminRoles() {
         <div className="glass-card overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5 text-xs text-slate-500 uppercase tracking-wider">
+              <tr className="border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">
                 <th className="text-left px-5 py-3 font-medium">Name</th>
                 <th className="text-left px-4 py-3 font-medium">Display Name</th>
                 <th className="text-left px-4 py-3 font-medium">Description</th>
@@ -273,20 +273,20 @@ export default function AdminRoles() {
                 <th className="text-right px-5 py-3 font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-stone-150">
               {loading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <tr key={i}>
                     {Array.from({ length: 5 }).map((_, j) => (
                       <td key={j} className="px-5 py-3">
-                        <div className="h-4 bg-white/5 rounded animate-pulse" />
+                        <div className="h-4 bg-stone-150 rounded animate-pulse" />
                       </td>
                     ))}
                   </tr>
                 ))
               ) : roles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-slate-500">
+                  <td colSpan={5} className="px-5 py-10 text-center text-stone-550">
                     No roles found. Add one above.
                   </td>
                 </tr>

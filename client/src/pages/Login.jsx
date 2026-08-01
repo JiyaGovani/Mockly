@@ -32,8 +32,12 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      await login({ email: form.email, password: form.password });
-      navigate('/questions', { replace: true });
+      const data = await login({ email: form.email, password: form.password });
+      if (data?.user?.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/questions', { replace: true });
+      }
     } catch (err) {
       setError(err.message || 'Login failed');
       triggerShake();
@@ -44,16 +48,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background orbs */}
-      <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-10%] left-[-5%]" />
-      <div
-        className="bg-orb w-72 h-72 bg-violet-600 bottom-[-5%] right-[-5%]"
-        style={{ animationDelay: '3s' }}
-      />
-      <div
-        className="bg-orb w-56 h-56 bg-purple-500 top-[40%] right-[20%]"
-        style={{ animationDelay: '5s' }}
-      />
+
 
       <div
         className={`glass-card w-full max-w-md p-8 md:p-10 page-enter ${
@@ -62,10 +57,10 @@ export default function Login() {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-900 to-amber-700 bg-clip-text text-transparent">
             Welcome Back
           </h1>
-          <p className="text-slate-400 mt-2 text-sm">
+          <p className="text-stone-500 mt-2 text-sm">
             Sign in to continue your interview prep
           </p>
         </div>
@@ -93,7 +88,7 @@ export default function Login() {
           <div>
             <label
               htmlFor="login-email"
-              className="block text-sm font-medium text-slate-300 mb-1.5"
+              className="block text-sm font-medium text-stone-600 mb-1.5"
             >
               Email
             </label>
@@ -112,7 +107,7 @@ export default function Login() {
           <div>
             <label
               htmlFor="login-password"
-              className="block text-sm font-medium text-slate-300 mb-1.5"
+              className="block text-sm font-medium text-stone-600 mb-1.5"
             >
               Password
             </label>
@@ -144,7 +139,7 @@ export default function Login() {
         </form>
 
         {/* Footer link */}
-        <p className="text-center text-sm text-slate-400 mt-6">
+        <p className="text-center text-sm text-stone-500 mt-6">
           Don&apos;t have an account?{' '}
           <Link to="/register" className="link-accent">
             Create one

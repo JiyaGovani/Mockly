@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 
@@ -34,7 +34,7 @@ function ScoreCircle({ score }) {
       <svg width="180" height="180" className="transform -rotate-90">
         <circle
           cx="90" cy="90" r={radius}
-          stroke="rgba(255,255,255,0.1)" strokeWidth="8" fill="none"
+          stroke="rgba(0,0,0,0.06)" strokeWidth="8" fill="none"
         />
         <circle
           cx="90" cy="90" r={radius}
@@ -46,8 +46,8 @@ function ScoreCircle({ score }) {
         />
       </svg>
       <div className="absolute text-center">
-        <p className="text-4xl font-bold text-slate-100">{score}%</p>
-        <p className="text-xs text-slate-500">Overall Score</p>
+        <p className="text-4xl font-bold text-stone-900">{score}%</p>
+        <p className="text-xs text-stone-500">Overall Score</p>
       </div>
     </div>
   );
@@ -66,13 +66,13 @@ function QuestionAccordion({ answer, question, index }) {
         className="w-full flex items-center gap-4 p-5 text-left hover:bg-white/[0.02] transition-all"
       >
         {/* Question number */}
-        <span className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold text-slate-300 flex-shrink-0">
+        <span className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-sm font-bold text-stone-700 flex-shrink-0">
           {index + 1}
         </span>
 
         {/* Question text */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-slate-300 line-clamp-1">{question.text}</p>
+          <p className="text-sm text-stone-800 line-clamp-1">{question.text}</p>
           <div className="flex gap-2 mt-1">
             <span className={`text-xs px-2 py-0.5 rounded-full ${TYPE_COLORS[question.type] || TYPE_COLORS.technical}`}>
               {question.type}
@@ -90,7 +90,7 @@ function QuestionAccordion({ answer, question, index }) {
 
         {/* Chevron */}
         <svg
-          className={`w-5 h-5 text-slate-500 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-stone-500 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -99,30 +99,30 @@ function QuestionAccordion({ answer, question, index }) {
 
       {/* Expanded content */}
       <div
-        className={`border-t border-white/10 transition-all duration-300 ease-in-out overflow-hidden ${
+        className={`border-t border-stone-200 transition-all duration-300 ease-in-out overflow-hidden ${
           expanded ? 'max-h-[1200px] opacity-100 p-5 space-y-5' : 'max-h-0 opacity-0 p-0 pointer-events-none'
         }`}
       >
         {/* User's answer */}
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Your Answer</h4>
-          <p className="text-sm text-slate-300 bg-white/5 rounded-lg p-3 leading-relaxed">
-            {answer.userAnswer || <span className="text-slate-600 italic">No answer provided</span>}
+          <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">Your Answer</h4>
+          <p className="text-sm text-stone-700 bg-stone-100 border border-stone-200 rounded-lg p-3 leading-relaxed">
+            {answer.userAnswer || <span className="text-stone-550 italic">No answer provided</span>}
           </p>
         </div>
 
         {/* Score breakdown */}
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Score Breakdown</h4>
+          <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">Score Breakdown</h4>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Keyword', score: answer.keywordScore, color: 'indigo' },
-              { label: 'Embedding', score: answer.embeddingScore, color: 'violet' },
-              { label: 'LLM', score: answer.llmScore, color: 'purple' },
+              { label: 'Keyword', score: answer.keywordScore, color: 'text-indigo-850' },
+              { label: 'Embedding', score: answer.embeddingScore, color: 'text-amber-900' },
+              { label: 'LLM', score: answer.llmScore, color: 'text-emerald-800' },
             ].map((s) => (
-              <div key={s.label} className="bg-white/5 rounded-lg p-3 text-center">
-                <p className="text-xs text-slate-500 mb-1">{s.label}</p>
-                <p className={`text-lg font-bold text-${s.color}-400`}>{s.score ?? 0}%</p>
+              <div key={s.label} className="bg-stone-100 border border-stone-200 rounded-lg p-3 text-center">
+                <p className="text-xs text-stone-500 mb-1">{s.label}</p>
+                <p className={`text-lg font-bold ${s.color}`}>{s.score ?? 0}%</p>
               </div>
             ))}
           </div>
@@ -131,10 +131,10 @@ function QuestionAccordion({ answer, question, index }) {
         {/* Feedback sections */}
         {answer.strengths && answer.strengths.length > 0 && (
           <div>
-            <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-2">✓ Strengths</h4>
+            <h4 className="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-2">✓ Strengths</h4>
             <ul className="space-y-1">
               {answer.strengths.map((s, i) => (
-                <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                <li key={i} className="text-sm text-stone-700 flex items-start gap-2">
                   <span className="text-emerald-500 mt-1 flex-shrink-0">•</span> {s}
                 </li>
               ))}
@@ -144,10 +144,10 @@ function QuestionAccordion({ answer, question, index }) {
 
         {answer.weaknesses && answer.weaknesses.length > 0 && (
           <div>
-            <h4 className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-2">✗ Weaknesses</h4>
+            <h4 className="text-xs font-semibold text-red-750 uppercase tracking-wider mb-2">✗ Weaknesses</h4>
             <ul className="space-y-1">
               {answer.weaknesses.map((w, i) => (
-                <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                <li key={i} className="text-sm text-stone-700 flex items-start gap-2">
                   <span className="text-red-500 mt-1 flex-shrink-0">•</span> {w}
                 </li>
               ))}
@@ -157,10 +157,10 @@ function QuestionAccordion({ answer, question, index }) {
 
         {answer.suggestions && answer.suggestions.length > 0 && (
           <div>
-            <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2">💡 Suggestions</h4>
+            <h4 className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-2">💡 Suggestions</h4>
             <ul className="space-y-1">
               {answer.suggestions.map((s, i) => (
-                <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                <li key={i} className="text-sm text-stone-700 flex items-start gap-2">
                   <span className="text-amber-500 mt-1 flex-shrink-0">•</span> {s}
                 </li>
               ))}
@@ -175,6 +175,7 @@ function QuestionAccordion({ answer, question, index }) {
 export default function MockScorecard() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -198,8 +199,8 @@ export default function MockScorecard() {
 
   if (loading || !session) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
-        <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
+      <div className="min-h-screen relative">
+
         <Navbar />
         <div className="flex items-center justify-center h-[80vh]">
           <div className="spinner" style={{ width: '3rem', height: '3rem' }} />
@@ -213,18 +214,17 @@ export default function MockScorecard() {
   );
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative">
       {/* Background */}
-      <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
-      <div className="bg-orb w-72 h-72 bg-violet-600 bottom-[10%] right-[-3%]" style={{ animationDelay: '3s' }} />
+
 
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-4 md:px-8 py-8 page-enter">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold text-slate-100 mb-2">Mock Interview Results</h1>
-          <p className="text-slate-400 text-sm">
+          <h1 className="text-2xl font-bold text-stone-900 mb-2">Mock Interview Results</h1>
+          <p className="text-stone-500 text-sm">
             {session.role} Session completed in {elapsed} minutes on{' '}
             {new Date(session.completedAt).toLocaleDateString()}
           </p>
@@ -238,23 +238,23 @@ export default function MockScorecard() {
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-4 mb-10 max-w-xl mx-auto">
           <div className="glass-card p-4 text-center">
-            <p className="text-xs text-slate-500 uppercase tracking-wider">Questions</p>
-            <p className="text-2xl font-bold text-slate-100 mt-1">{session.questions.length}</p>
+            <p className="text-xs text-stone-550 uppercase tracking-wider">Questions</p>
+            <p className="text-2xl font-bold text-stone-900 mt-1">{session.questions.length}</p>
           </div>
           <div className="glass-card p-4 text-center">
-            <p className="text-xs text-slate-500 uppercase tracking-wider">Time Taken</p>
-            <p className="text-2xl font-bold text-slate-100 mt-1">{elapsed} min</p>
+            <p className="text-xs text-stone-550 uppercase tracking-wider">Time Taken</p>
+            <p className="text-2xl font-bold text-stone-900 mt-1">{elapsed} min</p>
           </div>
           <div className="glass-card p-4 text-center">
-            <p className="text-xs text-slate-500 uppercase tracking-wider">Answered</p>
-            <p className="text-2xl font-bold text-slate-100 mt-1">
+            <p className="text-xs text-stone-550 uppercase tracking-wider">Answered</p>
+            <p className="text-2xl font-bold text-stone-900 mt-1">
               {session.answers.filter((a) => a.userAnswer && a.userAnswer.trim() !== '').length}
             </p>
           </div>
         </div>
 
         {/* Question breakdown */}
-        <h2 className="text-lg font-semibold text-slate-200 mb-4">Question Breakdown</h2>
+        <h2 className="text-lg font-semibold text-stone-900 mb-4">Question Breakdown</h2>
         <div className="space-y-3">
           {session.questions.map((q, idx) => {
             const answer = session.answers.find(
@@ -266,12 +266,23 @@ export default function MockScorecard() {
 
         {/* Back button */}
         <div className="mt-10 text-center">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
-          >
-            View Dashboard
-          </button>
+          {state?.placementRound ? (
+            <button
+              id="btn-scorecard-back-to-placement"
+              onClick={() => navigate('/placement')}
+              className="px-6 py-3 rounded-lg bg-gradient-to-r from-amber-900 to-amber-700 text-white font-medium shadow-lg shadow-amber-900/25 hover:shadow-amber-900/40 transition-all"
+            >
+              Back to Placement Hub
+            </button>
+          ) : (
+            <button
+              id="btn-scorecard-view-dashboard"
+              onClick={() => navigate('/dashboard')}
+              className="px-6 py-3 rounded-lg bg-gradient-to-r from-amber-900 to-amber-700 text-white font-medium shadow-lg shadow-amber-900/25 hover:shadow-amber-900/40 transition-all"
+            >
+              View Dashboard
+            </button>
+          )}
         </div>
       </main>
     </div>

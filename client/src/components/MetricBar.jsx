@@ -15,12 +15,12 @@ export default function MetricBar({ label, value, icon }) {
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-sm">
-        <span className="text-slate-400 flex items-center gap-1.5">
+        <span className="text-stone-600 flex items-center gap-1.5">
           <span>{icon}</span> {label}
         </span>
-        <span className="text-slate-200 font-semibold">{value}%</span>
+        <span className="text-stone-900 font-semibold">{value}%</span>
       </div>
-      <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+      <div className="h-2 rounded-full bg-stone-200 overflow-hidden">
         <div
           className={`h-full rounded-full ${getBarColor(value)} transition-all duration-1000 ease-out`}
           style={{ width: `${value}%` }}

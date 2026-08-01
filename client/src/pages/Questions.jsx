@@ -79,20 +79,20 @@ function QuestionModal({ question, onClose }) {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all"
+          className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 hover:text-stone-800 transition-all"
         >
           ✕
         </button>
 
         {/* Badges */}
         <div className="flex flex-wrap gap-2 mb-4">
-          <Badge label={question.role} colorSet={{ bg: 'bg-indigo-500/15', text: 'text-indigo-400' }} />
+          <Badge label={question.role} colorSet={{ bg: 'bg-amber-100', text: 'text-amber-800' }} />
           <Badge label={question.type} colorSet={typeColors} />
           <Badge label={question.difficulty} colorSet={diffColors} />
         </div>
 
         {/* Question text */}
-        <h2 className="text-lg font-semibold text-slate-100 leading-relaxed mb-6">
+        <h2 className="text-lg font-semibold text-stone-900 leading-relaxed mb-6">
           {question.text}
         </h2>
 
@@ -102,12 +102,12 @@ function QuestionModal({ question, onClose }) {
             {question.options.map((opt, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10"
+                className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-stone-100 border border-stone-200"
               >
-                <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium text-slate-400">
+                <span className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center text-xs font-medium text-stone-700">
                   {String.fromCharCode(65 + i)}
                 </span>
-                <span className="text-sm text-slate-300">{opt}</span>
+                <span className="text-sm text-stone-700">{opt}</span>
               </div>
             ))}
           </div>
@@ -210,10 +210,9 @@ export default function Questions() {
   }, [activeRole, activeType, activeDifficulty, searchDebounced]);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative">
       {/* Background orbs */}
-      <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
-      <div className="bg-orb w-72 h-72 bg-violet-600 bottom-[10%] right-[-3%]" style={{ animationDelay: '3s' }} />
+
 
       <Navbar />
 
@@ -221,8 +220,8 @@ export default function Questions() {
         {/* Page header */}
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-100">Question Bank</h1>
-            <p className="text-slate-400 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-stone-900">Question Bank</h1>
+            <p className="text-stone-500 text-sm mt-1">
               Browse interview questions by role, type, and difficulty
             </p>
           </div>
@@ -243,8 +242,8 @@ export default function Questions() {
             onClick={() => setActiveRole('all')}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
               activeRole === 'all'
-                ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
-                : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300 border border-white/10'
+                ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
+                : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-800 border border-stone-300'
             }`}
           >
             All Roles
@@ -255,8 +254,8 @@ export default function Questions() {
               onClick={() => setActiveRole(role.name)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
                 activeRole === role.name
-                  ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
-                  : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300 border border-white/10'
+                  ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
+                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-800 border border-stone-300'
               }`}
             >
               {role.displayName}
@@ -265,32 +264,35 @@ export default function Questions() {
         </div>
 
         {/* Filters row */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          {/* Type dropdown */}
-          <select
-            value={activeType}
-            onChange={(e) => setActiveType(e.target.value)}
-            className="input-field w-auto min-w-[140px] text-sm py-2 px-3 cursor-pointer"
-          >
-            {TYPES.map((t) => (
-              <option key={t} value={t} className="bg-slate-800">
-                {t === 'all' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1)}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-col md:flex-row gap-3 mb-6 items-stretch md:items-center">
+          {/* Side-by-side Dropdowns */}
+          <div className="flex gap-2 shrink-0">
+            {/* Type dropdown */}
+            <select
+              value={activeType}
+              onChange={(e) => setActiveType(e.target.value)}
+              className="bg-stone-100 hover:bg-stone-200 border border-stone-300 rounded-xl text-stone-700 text-sm py-2 px-3.5 focus:outline-none focus:ring-1 focus:ring-amber-900/40 cursor-pointer shadow-sm min-w-[140px] transition-all"
+            >
+              {TYPES.map((t) => (
+                <option key={t} value={t} className="bg-white text-stone-700">
+                  {t === 'all' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1)}
+                </option>
+              ))}
+            </select>
 
-          {/* Difficulty dropdown */}
-          <select
-            value={activeDifficulty}
-            onChange={(e) => setActiveDifficulty(e.target.value)}
-            className="input-field w-auto min-w-[140px] text-sm py-2 px-3 cursor-pointer"
-          >
-            {DIFFICULTIES.map((d) => (
-              <option key={d} value={d} className="bg-slate-800">
-                {d === 'all' ? 'All Difficulties' : d.charAt(0).toUpperCase() + d.slice(1)}
-              </option>
-            ))}
-          </select>
+            {/* Difficulty dropdown */}
+            <select
+              value={activeDifficulty}
+              onChange={(e) => setActiveDifficulty(e.target.value)}
+              className="bg-stone-100 hover:bg-stone-200 border border-stone-300 rounded-xl text-stone-700 text-sm py-2 px-3.5 focus:outline-none focus:ring-1 focus:ring-amber-900/40 cursor-pointer shadow-sm min-w-[140px] transition-all"
+            >
+              {DIFFICULTIES.map((d) => (
+                <option key={d} value={d} className="bg-white text-stone-700">
+                  {d === 'all' ? 'All Difficulties' : d.charAt(0).toUpperCase() + d.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Search */}
           <div className="flex-1 min-w-[200px]">
@@ -299,79 +301,82 @@ export default function Questions() {
               placeholder="Search questions…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input-field text-sm py-2 px-3"
+              className="input-field text-sm py-2 px-3 w-full"
             />
           </div>
         </div>
 
         {/* Results count */}
-        <p className="text-xs text-slate-500 mb-4">
+        <p className="text-xs text-stone-500 mb-4">
           {loading ? 'Loading…' : `${pagination.total} question${pagination.total !== 1 ? 's' : ''} found`}
         </p>
 
         {/* Question grid */}
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
-          </div>
-        ) : questions.length === 0 ? (
-          /* Empty state */
-          <div className="text-center py-16">
-            <div className="text-5xl mb-4">🔍</div>
-            <h3 className="text-lg font-semibold text-slate-300 mb-2">
-              No questions found
-            </h3>
-            <p className="text-slate-500 text-sm">
-              Try adjusting your filters or search term
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {questions.map((q) => {
-              const diffColors = DIFFICULTY_COLORS[q.difficulty] || DIFFICULTY_COLORS.easy;
-              const typeColors = TYPE_COLORS[q.type] || TYPE_COLORS.technical;
+        <div className="min-h-[500px]">
+          {loading ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          ) : questions.length === 0 ? (
+            /* Empty state */
+            <div className="text-center py-16">
+              <div className="text-5xl mb-4">🔍</div>
+              <h3 className="text-lg font-semibold text-stone-600 mb-2">
+                No questions found
+              </h3>
+              <p className="text-stone-500 text-sm">
+                Try adjusting your filters or search term
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {questions.map((q) => {
+                const diffColors = DIFFICULTY_COLORS[q.difficulty] || DIFFICULTY_COLORS.easy;
+                const typeColors = TYPE_COLORS[q.type] || TYPE_COLORS.technical;
 
-              return (
-                <button
-                  key={q._id}
-                  onClick={() => setSelectedQuestion(q)}
-                  className="glass-card p-5 text-left group hover:border-indigo-500/30 transition-all duration-300 relative overflow-hidden"
-                >
-                  {/* Difficulty accent bar */}
-                  <div
-                    className={`absolute left-0 top-0 bottom-0 w-1 ${diffColors.bar} rounded-l-xl`}
-                  />
+                return (
+                  <button
+                    key={q._id}
+                    onClick={() => setSelectedQuestion(q)}
+                    className="glass-card p-5 text-left group hover:border-indigo-500/30 transition-all duration-300 relative overflow-hidden"
+                  >
+                    {/* Difficulty accent bar */}
+                    <div
+                      className={`absolute left-0 top-0 bottom-0 w-1 ${diffColors.bar} rounded-l-xl`}
+                    />
 
-                  {/* Badges */}
-                  <div className="flex flex-wrap gap-1.5 mb-3 pl-2">
-                    <Badge label={q.type} colorSet={typeColors} />
-                    <Badge label={q.difficulty} colorSet={diffColors} />
-                    {q.type === 'aptitude' && (
-                      <Badge
-                        label="MCQ"
-                        colorSet={{ bg: 'bg-orange-500/15', text: 'text-orange-400' }}
-                      />
-                    )}
-                  </div>
+                    {/* Badges */}
+                    <div className="flex flex-wrap gap-1.5 mb-3 pl-2">
+                      <Badge label={q.type} colorSet={typeColors} />
+                      <Badge label={q.difficulty} colorSet={diffColors} />
+                      {q.type === 'aptitude' && (
+                        <Badge
+                          label="MCQ"
+                          colorSet={{ bg: 'bg-orange-500/15', text: 'text-orange-400' }}
+                        />
+                      )}
+                    </div>
 
-                  {/* Question text (truncated) */}
-                  <p className="text-sm text-slate-300 leading-relaxed pl-2 line-clamp-3 group-hover:text-slate-200 transition-colors">
-                    {q.text}
-                  </p>
+                    {/* Question text (truncated) */}
+                    <p className="text-sm text-stone-700 leading-relaxed pl-2 line-clamp-3 group-hover:text-stone-900 transition-colors">
+                      {q.text}
+                    </p>
 
-                  {/* Role chip */}
-                  <div className="mt-3 pl-2">
-                    <span className="text-xs text-slate-500 font-medium">
-                      {q.role}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
+                    {/* Role chip */}
+                    <div className="mt-3 pl-2">
+                      <span className="text-xs text-stone-500 font-medium">
+                        {q.role}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
 
         {/* Pagination */}
         {!loading && pagination.pages > 1 && (
@@ -379,17 +384,17 @@ export default function Questions() {
             <button
               onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}
               disabled={pagination.page <= 1}
-              className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-sm border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               ← Prev
             </button>
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-stone-500">
               Page {pagination.page} of {pagination.pages}
             </span>
             <button
               onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
               disabled={pagination.page >= pagination.pages}
-              className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-sm border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               Next →
             </button>
@@ -410,25 +415,25 @@ export default function Questions() {
           <div className="glass-card relative w-full max-w-md p-6 md:p-8 page-enter" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowMockModal(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all"
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 hover:text-stone-850 transition-all"
             >
               ✕
             </button>
 
-            <h2 className="text-lg font-bold text-slate-100 mb-2">Start Mock Interview</h2>
-            <p className="text-sm text-slate-400 mb-6">
+            <h2 className="text-lg font-bold text-stone-900 mb-2">Start Mock Interview</h2>
+            <p className="text-sm text-stone-500 mb-6">
               10 balanced questions • 45-minute timer • AI-graded scorecard
             </p>
 
-            <label className="block text-sm font-medium text-slate-300 mb-2">Select Target Role</label>
+            <label className="block text-sm font-medium text-stone-700 mb-2">Select Target Role</label>
             <select
               value={mockRole}
               onChange={(e) => setMockRole(e.target.value)}
-              className="input-field w-full text-sm py-2.5 px-3 cursor-pointer mb-6"
+              className="input-field w-full text-sm py-2.5 px-3 cursor-pointer mb-6 animate-none"
             >
-              <option value="" className="bg-slate-800">Choose a role...</option>
+              <option value="" className="bg-white text-stone-700">Choose a role...</option>
               {roles.map((role) => (
-                <option key={role._id} value={role.name} className="bg-slate-800">
+                <option key={role._id} value={role.name} className="bg-white text-stone-700">
                   {role.displayName}
                 </option>
               ))}

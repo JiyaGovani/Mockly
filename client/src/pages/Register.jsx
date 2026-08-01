@@ -73,16 +73,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background orbs */}
-      <div className="bg-orb w-96 h-96 bg-violet-600 top-[-8%] right-[-5%]" />
-      <div
-        className="bg-orb w-80 h-80 bg-indigo-600 bottom-[-8%] left-[-5%]"
-        style={{ animationDelay: '2s' }}
-      />
-      <div
-        className="bg-orb w-48 h-48 bg-purple-500 top-[50%] left-[15%]"
-        style={{ animationDelay: '4s' }}
-      />
+
 
       <div
         className={`glass-card w-full max-w-md p-8 md:p-10 page-enter ${
@@ -91,10 +82,10 @@ export default function Register() {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-900 to-amber-700 bg-clip-text text-transparent">
             Create Account
           </h1>
-          <p className="text-slate-400 mt-2 text-sm">
+          <p className="text-stone-500 mt-2 text-sm">
             Start your journey to interview mastery
           </p>
         </div>
@@ -122,7 +113,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="reg-name"
-              className="block text-sm font-medium text-slate-300 mb-1.5"
+              className="block text-sm font-medium text-stone-600 mb-1.5"
             >
               Full Name
             </label>
@@ -141,7 +132,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="reg-email"
-              className="block text-sm font-medium text-slate-300 mb-1.5"
+              className="block text-sm font-medium text-stone-600 mb-1.5"
             >
               Email
             </label>
@@ -160,7 +151,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="reg-password"
-              className="block text-sm font-medium text-slate-300 mb-1.5"
+              className="block text-sm font-medium text-stone-600 mb-1.5"
             >
               Password
             </label>
@@ -179,7 +170,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="reg-confirm"
-              className="block text-sm font-medium text-slate-300 mb-1.5"
+              className="block text-sm font-medium text-stone-600 mb-1.5"
             >
               Confirm Password
             </label>
@@ -211,7 +202,7 @@ export default function Register() {
         </form>
 
         {/* Footer link */}
-        <p className="text-center text-sm text-slate-400 mt-6">
+        <p className="text-center text-sm text-stone-500 mt-6">
           Already have an account?{' '}
           <Link to="/login" className="link-accent">
             Sign in

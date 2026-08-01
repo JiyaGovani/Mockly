@@ -71,7 +71,11 @@ function GuestRoute({ children }) {
     );
   }
 
-  return user ? <Navigate to="/questions" replace /> : children;
+  if (user) {
+    const redirectPath = user.role === 'admin' ? '/admin' : '/questions';
+    return <Navigate to={redirectPath} replace />;
+  }
+  return children;
 }
 
 function App() {

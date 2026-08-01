@@ -79,11 +79,11 @@ function QuestionModal({ question, onClose, onSaved }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 space-y-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">{isEdit ? 'Edit Question' : 'Add Question'}</h2>
+          <h2 className="text-lg font-bold text-stone-900">{isEdit ? 'Edit Question' : 'Add Question'}</h2>
           <button
             id="modal-close"
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-300 text-xl leading-none"
+            className="text-stone-500 hover:text-stone-800 text-xl leading-none"
           >
             ✕
           </button>
@@ -98,14 +98,14 @@ function QuestionModal({ question, onClose, onSaved }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Text */}
           <div className="space-y-1">
-            <label className="text-xs text-slate-400 font-medium">Question Text *</label>
+            <label className="text-xs text-stone-600 font-medium">Question Text *</label>
             <textarea
               id="q-text"
               required
               rows={3}
               value={form.text}
               onChange={(e) => set('text', e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 resize-none"
+              className="w-full px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 resize-none shadow-sm"
               placeholder="Enter question text…"
             />
           </div>
@@ -118,15 +118,15 @@ function QuestionModal({ question, onClose, onSaved }) {
               { id: 'q-difficulty', label: 'Difficulty *', key: 'difficulty', options: DIFFICULTIES },
             ].map(({ id, label, key, options }) => (
               <div key={key} className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium">{label}</label>
+                <label className="text-xs text-stone-600 font-medium">{label}</label>
                 <select
                   id={id}
                   value={form[key]}
                   onChange={(e) => set(key, e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-900/50 shadow-sm"
                 >
                   {options.map((o) => (
-                    <option key={o} value={o} className="bg-slate-900">
+                    <option key={o} value={o} className="bg-white">
                       {o}
                     </option>
                   ))}
@@ -137,34 +137,34 @@ function QuestionModal({ question, onClose, onSaved }) {
 
           {/* Expected Answer */}
           <div className="space-y-1">
-            <label className="text-xs text-slate-400 font-medium">Expected Answer</label>
+            <label className="text-xs text-stone-600 font-medium">Expected Answer</label>
             <textarea
               id="q-expected"
               rows={2}
               value={form.expectedAnswer}
               onChange={(e) => set('expectedAnswer', e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 resize-none"
+              className="w-full px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 resize-none shadow-sm"
               placeholder="Model answer for AI grading…"
             />
           </div>
 
           {/* Key Points */}
           <div className="space-y-1">
-            <label className="text-xs text-slate-400 font-medium">Key Points (comma-separated)</label>
+            <label className="text-xs text-stone-600 font-medium">Key Points (comma-separated)</label>
             <input
               id="q-keypoints"
               type="text"
               value={form.keyPoints}
               onChange={(e) => set('keyPoints', e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+              className="w-full px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 shadow-sm"
               placeholder="keyword1, keyword2, keyword3…"
             />
           </div>
 
           {/* MCQ Options (aptitude only) */}
           {form.type === 'aptitude' && (
-            <div className="space-y-3 p-4 rounded-xl bg-orange-500/5 border border-orange-500/20">
-              <p className="text-xs text-orange-400 font-medium uppercase tracking-wider">MCQ Options</p>
+            <div className="space-y-3 p-4 rounded-xl bg-orange-500/5 border border-orange-500/10">
+              <p className="text-xs text-orange-850 font-semibold uppercase tracking-wider">MCQ Options</p>
               {form.options.map((opt, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <input
@@ -173,7 +173,7 @@ function QuestionModal({ question, onClose, onSaved }) {
                     name="correctOption"
                     checked={form.correctOption === i}
                     onChange={() => set('correctOption', i)}
-                    className="accent-orange-500"
+                    className="accent-orange-650"
                   />
                   <input
                     id={`q-option-${i}`}
@@ -181,11 +181,11 @@ function QuestionModal({ question, onClose, onSaved }) {
                     value={opt}
                     onChange={(e) => setOption(i, e.target.value)}
                     placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                    className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-orange-500/50"
+                    className="flex-1 px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-orange-500/50 shadow-sm"
                   />
                 </div>
               ))}
-              <p className="text-xs text-slate-500">Select the radio button next to the correct option.</p>
+              <p className="text-xs text-stone-500">Select the radio button next to the correct option.</p>
             </div>
           )}
 
@@ -198,7 +198,7 @@ function QuestionModal({ question, onClose, onSaved }) {
               onChange={(e) => set('isActive', e.target.checked)}
               className="w-4 h-4 accent-indigo-500"
             />
-            <span className="text-sm text-slate-300">Active (visible to students)</span>
+            <span className="text-sm text-stone-700">Active (visible to students)</span>
           </label>
 
           {/* Actions */}
@@ -206,7 +206,7 @@ function QuestionModal({ question, onClose, onSaved }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl bg-white/5 text-slate-400 text-sm font-medium hover:bg-white/10 transition-all"
+              className="flex-1 py-2.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-200 transition-all"
             >
               Cancel
             </button>
@@ -214,7 +214,7 @@ function QuestionModal({ question, onClose, onSaved }) {
               id="btn-save-question"
               type="submit"
               disabled={saving}
-              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
             >
               {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Question'}
             </button>
@@ -243,13 +243,13 @@ function DeleteConfirm({ question, onClose, onDeleted }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="glass-card w-full max-w-sm p-6 space-y-5">
-        <h2 className="text-lg font-bold text-white">Deactivate Question?</h2>
-        <p className="text-sm text-slate-400">
-          This question will be set to <span className="text-red-400 font-medium">inactive</span> and hidden from students. You can reactivate it later.
+        <h2 className="text-lg font-bold text-stone-900">Deactivate Question?</h2>
+        <p className="text-sm text-stone-600">
+          This question will be set to <span className="text-red-700 font-semibold">inactive</span> and hidden from students. You can reactivate it later.
         </p>
-        <p className="text-xs text-slate-500 bg-white/5 p-3 rounded-lg line-clamp-2">{question.text}</p>
+        <p className="text-xs text-stone-600 bg-stone-100 border border-stone-200 p-3 rounded-lg line-clamp-2">{question.text}</p>
         <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-white/5 text-slate-400 text-sm hover:bg-white/10 transition-all">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-650 text-sm hover:bg-stone-200 transition-all">
             Cancel
           </button>
           <button
@@ -305,22 +305,22 @@ function BulkImportPanel({ onImported }) {
 
   return (
     <div className="glass-card p-5 space-y-4">
-      <h3 className="text-sm font-semibold text-slate-300">Bulk Import (JSON)</h3>
-      <p className="text-xs text-slate-500">
-        Paste a JSON array of question objects. Each must have: <code className="text-indigo-400">text</code>, <code className="text-indigo-400">role</code>, <code className="text-indigo-400">type</code>, <code className="text-indigo-400">difficulty</code>.
+      <h3 className="text-sm font-semibold text-stone-850">Bulk Import (JSON)</h3>
+      <p className="text-xs text-stone-500">
+        Paste a JSON array of question objects. Each must have: <code className="text-amber-900 bg-stone-100 px-1 py-0.5 rounded font-mono text-xs">text</code>, <code className="text-amber-900 bg-stone-100 px-1 py-0.5 rounded font-mono text-xs">role</code>, <code className="text-amber-900 bg-stone-100 px-1 py-0.5 rounded font-mono text-xs">type</code>, <code className="text-amber-900 bg-stone-100 px-1 py-0.5 rounded font-mono text-xs">difficulty</code>.
       </p>
       <textarea
         id="bulk-import-textarea"
         rows={8}
         value={json}
         onChange={(e) => { setJson(e.target.value); setPreview(null); setResult(null); }}
-        className="w-full px-3 py-2 rounded-xl bg-black/30 border border-white/10 text-xs text-slate-300 font-mono placeholder-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 resize-y"
+        className="w-full px-3 py-2 rounded-xl bg-stone-100 border border-stone-200 text-xs text-stone-800 font-mono placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 resize-y shadow-inner"
         placeholder={'[\n  {\n    "text": "What is Big O notation?",\n    "role": "SDE",\n    "type": "technical",\n    "difficulty": "easy",\n    "expectedAnswer": "...",\n    "keyPoints": ["time complexity", "space complexity"]\n  }\n]'}
       />
-      {parseError && <p className="text-xs text-red-400">⚠ {parseError}</p>}
-      {result && <p className="text-xs text-emerald-400">✓ {result}</p>}
+      {parseError && <p className="text-xs text-red-500">⚠ {parseError}</p>}
+      {result && <p className="text-xs text-emerald-700 font-semibold">✓ {result}</p>}
       {preview && (
-        <p className="text-xs text-indigo-400">
+        <p className="text-xs text-amber-900 font-semibold">
           ✓ Parsed {preview.length} question{preview.length !== 1 ? 's' : ''} — ready to import
         </p>
       )}
@@ -329,7 +329,7 @@ function BulkImportPanel({ onImported }) {
           id="btn-parse-json"
           onClick={handleParse}
           disabled={!json.trim()}
-          className="px-4 py-2 rounded-xl bg-white/5 text-slate-300 text-sm hover:bg-white/10 transition-all disabled:opacity-30"
+          className="px-4 py-2 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 text-sm hover:bg-stone-200 transition-all disabled:opacity-30"
         >
           Parse & Preview
         </button>
@@ -337,7 +337,7 @@ function BulkImportPanel({ onImported }) {
           id="btn-bulk-import"
           onClick={handleImport}
           disabled={!preview || importing}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-30"
+          className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-30"
         >
           {importing ? 'Importing…' : `Import ${preview ? preview.length : ''} Questions`}
         </button>
@@ -348,15 +348,15 @@ function BulkImportPanel({ onImported }) {
 
 // ─── Main Page ───
 const DIFF_COLORS = {
-  easy: 'bg-emerald-500/15 text-emerald-400',
-  medium: 'bg-amber-500/15 text-amber-400',
-  hard: 'bg-red-500/15 text-red-400',
+  easy: 'bg-emerald-100 text-emerald-800',
+  medium: 'bg-amber-100 text-amber-850',
+  hard: 'bg-red-100 text-red-850',
 };
 const TYPE_COLORS = {
-  technical: 'bg-blue-500/15 text-blue-400',
-  behavioral: 'bg-purple-500/15 text-purple-400',
-  hr: 'bg-teal-500/15 text-teal-400',
-  aptitude: 'bg-orange-500/15 text-orange-400',
+  technical: 'bg-blue-100 text-blue-800',
+  behavioral: 'bg-purple-100 text-purple-800',
+  hr: 'bg-teal-100 text-teal-800',
+  aptitude: 'bg-orange-100 text-orange-800',
 };
 
 export default function AdminQuestions() {
@@ -411,21 +411,21 @@ export default function AdminQuestions() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-white">Questions</h1>
-            <p className="text-sm text-slate-400 mt-1">{total} total questions in the bank</p>
+            <h1 className="text-2xl font-bold text-stone-900">Questions</h1>
+            <p className="text-sm text-stone-600 mt-1">{total} total questions in the bank</p>
           </div>
           <div className="flex gap-2">
             <button
               id="btn-toggle-bulk"
               onClick={() => setShowBulk((v) => !v)}
-              className="px-4 py-2 rounded-xl bg-white/5 text-slate-300 text-sm font-medium hover:bg-white/10 transition-all"
+              className="px-4 py-2 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-200 transition-all"
             >
               {showBulk ? 'Hide' : '📥 Bulk Import'}
             </button>
             <button
               id="btn-add-question"
               onClick={() => setEditQ({})}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold hover:opacity-90 transition-all shadow-md shadow-indigo-500/20"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-900 to-amber-700 text-white text-sm font-semibold hover:opacity-90 transition-all shadow-md shadow-amber-900/20"
             >
               + Add Question
             </button>
@@ -442,25 +442,25 @@ export default function AdminQuestions() {
             placeholder="Search questions…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 w-64"
+            className="px-4 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-900/50 w-64 shadow-sm"
           />
           <select
             id="q-filter-type"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+            className="px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-700 focus:outline-none focus:ring-1 focus:ring-amber-900/50 shadow-sm cursor-pointer"
           >
             <option value="">All Types</option>
-            {TYPES.map((t) => <option key={t} value={t} className="bg-slate-900">{t}</option>)}
+            {TYPES.map((t) => <option key={t} value={t} className="bg-white">{t}</option>)}
           </select>
           <select
             id="q-filter-diff"
             value={filterDiff}
             onChange={(e) => setFilterDiff(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+            className="px-3 py-2 rounded-xl bg-white border border-stone-200 text-sm text-stone-700 focus:outline-none focus:ring-1 focus:ring-amber-900/50 shadow-sm cursor-pointer"
           >
             <option value="">All Difficulties</option>
-            {DIFFICULTIES.map((d) => <option key={d} value={d} className="bg-slate-900">{d}</option>)}
+            {DIFFICULTIES.map((d) => <option key={d} value={d} className="bg-white">{d}</option>)}
           </select>
         </div>
 
@@ -474,7 +474,7 @@ export default function AdminQuestions() {
         <div className="glass-card overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5 text-xs text-slate-500 uppercase tracking-wider">
+              <tr className="border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">
                 <th className="text-left px-5 py-3 font-medium w-1/2">Question</th>
                 <th className="text-left px-4 py-3 font-medium">Role</th>
                 <th className="text-left px-4 py-3 font-medium">Type</th>
@@ -483,44 +483,44 @@ export default function AdminQuestions() {
                 <th className="text-right px-5 py-3 font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-stone-150">
               {loading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i}>
                     {Array.from({ length: 6 }).map((_, j) => (
                       <td key={j} className="px-5 py-3">
-                        <div className="h-4 bg-white/5 rounded animate-pulse" />
+                        <div className="h-4 bg-stone-150 rounded animate-pulse" />
                       </td>
                     ))}
                   </tr>
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-slate-500">
+                  <td colSpan={6} className="px-5 py-10 text-center text-stone-550">
                     No questions found
                   </td>
                 </tr>
               ) : (
                 filtered.map((q) => (
-                  <tr key={q._id} className="hover:bg-white/3 transition-colors">
+                  <tr key={q._id} className="hover:bg-stone-100/50 transition-colors">
                     <td className="px-5 py-3">
-                      <p className="text-slate-200 line-clamp-2 leading-snug">{q.text}</p>
+                      <p className="text-stone-900 line-clamp-2 leading-snug">{q.text}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-xs text-slate-400 font-medium">{q.role}</span>
+                      <span className="text-xs text-stone-600 font-medium">{q.role}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${TYPE_COLORS[q.type] || 'bg-white/5 text-slate-400'}`}>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${TYPE_COLORS[q.type] || 'bg-stone-150 text-stone-600'}`}>
                         {q.type}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${DIFF_COLORS[q.difficulty]}`}>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${DIFF_COLORS[q.difficulty]}`}>
                         {q.difficulty}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${q.isActive ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-500/15 text-slate-500'}`}>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${q.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-150 text-stone-500'}`}>
                         {q.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
@@ -529,7 +529,7 @@ export default function AdminQuestions() {
                         <button
                           id={`btn-edit-q-${q._id}`}
                           onClick={() => setEditQ(q)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all"
+                          className="p-1.5 rounded-lg text-stone-500 hover:text-amber-900 hover:bg-amber-900/10 transition-all"
                           title="Edit"
                         >
                           ✏️
@@ -537,7 +537,7 @@ export default function AdminQuestions() {
                         <button
                           id={`btn-delete-q-${q._id}`}
                           onClick={() => setDeleteQ(q)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                          className="p-1.5 rounded-lg text-stone-500 hover:text-red-700 hover:bg-red-500/10 transition-all"
                           title="Deactivate"
                         >
                           🗑️
