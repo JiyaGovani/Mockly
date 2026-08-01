@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import Navbar from '../components/Navbar';
+import EvaluationLoadingCard from '../components/EvaluationLoadingCard';
+import EvaluationResultScorecard from '../components/EvaluationResultScorecard';
 
-// ─── Axios instance ───
-const api = axios.create({ baseURL: '/api' });
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('mockly_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-// ─── Constants ───
+// Color mappings for question difficulty tags
 const DIFFICULTY_COLORS = {
   easy: { bg: 'bg-emerald-500/15', text: 'text-emerald-400' },
   medium: { bg: 'bg-amber-500/15', text: 'text-amber-400' },
   hard: { bg: 'bg-red-500/15', text: 'text-red-400' },
 };
 
+// Color mappings for question category tags
 const TYPE_COLORS = {
   technical: { bg: 'bg-blue-500/15', text: 'text-blue-400' },
   behavioral: { bg: 'bg-purple-500/15', text: 'text-purple-400' },
@@ -25,172 +20,22 @@ const TYPE_COLORS = {
   aptitude: { bg: 'bg-orange-500/15', text: 'text-orange-400' },
 };
 
-const TIPS = [
-  '💡 Tip: Structure your answer with a clear definition first, then examples.',
-  '🎯 Focus on key terms that the interviewer is looking for.',
-  '⏱ In a real interview, aim for 2-3 minute responses.',
-  '📝 Use the STAR method for behavioral questions (Situation, Task, Action, Result).',
-  '🧠 Think out loud — interviewers value your thought process.',
-  '✅ Cover edge cases and trade-offs to stand out.',
-  '🔄 Compare and contrast when explaining similar concepts.',
-  '📊 Back up your points with real-world examples when possible.',
-];
-
-const PROCESSING_STEPS = [
-  { label: 'Analyzing keywords in your answer', icon: '🔍' },
-  { label: 'Computing semantic similarity', icon: '🧮' },
-  { label: 'Running AI evaluation model', icon: '🤖' },
-  { label: 'Generating detailed feedback', icon: '📝' },
-];
-
-// ─── Score Ring Component ───
-function ScoreRing({ score, size = 120, stroke = 8, label }) {
-  const radius = (size - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
-
-  const getColor = (s) => {
-    if (s >= 80) return '#22c55e';
-    if (s >= 60) return '#eab308';
-    if (s >= 40) return '#f97316';
-    return '#ef4444';
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="-rotate-90">
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            fill="none"
-            stroke="rgba(255,255,255,0.1)"
-            strokeWidth={stroke}
-          />
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            fill="none"
-            stroke={getColor(score)}
-            strokeWidth={stroke}
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            style={{ transition: 'stroke-dashoffset 1.5s ease-out' }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold text-slate-100">{score}</span>
-        </div>
-      </div>
-      {label && <span className="text-xs text-slate-400 font-medium">{label}</span>}
-    </div>
-  );
-}
-
-// ─── Metric Bar ───
-function MetricBar({ label, value, icon }) {
-  const getBarColor = (v) => {
-    if (v >= 80) return 'bg-emerald-500';
-    if (v >= 60) return 'bg-amber-500';
-    if (v >= 40) return 'bg-orange-500';
-    return 'bg-red-500';
-  };
-
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-slate-400 flex items-center gap-1.5">
-          <span>{icon}</span> {label}
-        </span>
-        <span className="text-slate-200 font-semibold">{value}%</span>
-      </div>
-      <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-        <div
-          className={`h-full rounded-full ${getBarColor(value)} transition-all duration-1000 ease-out`}
-          style={{ width: `${value}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ─── Feedback Card ───
-function FeedbackCard({ title, items, icon, colorClass }) {
-  if (!items || items.length === 0) return null;
-  return (
-    <div className="glass-card p-4">
-      <h4 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${colorClass}`}>
-        <span>{icon}</span> {title}
-      </h4>
-      <ul className="space-y-2">
-        {items.map((item, i) => (
-          <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
-            <span className="text-slate-500 mt-0.5 shrink-0">•</span>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-// ─── Loading Card ───
-function LoadingCard({ currentStep }) {
-  const [tipIndex, setTipIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTipIndex((prev) => (prev + 1) % TIPS.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="glass-card p-6 md:p-8 page-enter">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="spinner" style={{ width: '1.5rem', height: '1.5rem' }} />
-        <h3 className="text-lg font-semibold text-slate-100">Evaluating your answer...</h3>
-      </div>
-
-      {/* Processing Steps */}
-      <div className="space-y-3 mb-8">
-        {PROCESSING_STEPS.map((step, i) => (
-          <div
-            key={i}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-500 ${
-              i < currentStep
-                ? 'bg-emerald-500/10 border border-emerald-500/20'
-                : i === currentStep
-                ? 'bg-indigo-500/10 border border-indigo-500/30 animate-pulse'
-                : 'bg-white/5 border border-white/10 opacity-40'
-            }`}
-          >
-            <span className="text-lg">{i < currentStep ? '✅' : step.icon}</span>
-            <span className={`text-sm ${i <= currentStep ? 'text-slate-200' : 'text-slate-500'}`}>
-              {step.label}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* Rotating Tips */}
-      <div className="bg-indigo-500/10 rounded-xl p-4 border border-indigo-500/20">
-        <p className="text-sm text-indigo-300 transition-all duration-500" key={tipIndex}>
-          {TIPS[tipIndex]}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main Practice Page ───
+/**
+ * ==============================================================================
+ * PRACTICE INTERVIEW PAGE
+ * ==============================================================================
+ * Renders the question practice view.
+ * States handled cleanly:
+ * 1. Initial Loading (Skeleton Loader)
+ * 2. Question View + Answer Form (MCQ option selector or descriptive text area)
+ * 3. AI Evaluation Loading (Step-by-step progress & interview tips)
+ * 4. Evaluation Result Scorecard (Score ring, keywords, & AI feedback)
+ */
 export default function Practice() {
-  const { id } = useParams();
+  const { id } = useParams(); // Get question ID from URL route
   const navigate = useNavigate();
 
+  // Component States
   const [question, setQuestion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userAnswer, setUserAnswer] = useState('');
@@ -199,7 +44,7 @@ export default function Practice() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  // Fetch the question details
+  // Fetch question details on component mount
   useEffect(() => {
     api
       .get(`/questions/${id}`)
@@ -214,7 +59,7 @@ export default function Practice() {
       });
   }, [id]);
 
-  // Simulate step progression during loading
+  // Simulate progress step transitions during loading state
   useEffect(() => {
     if (!submitting) return;
     const timers = [
@@ -225,6 +70,7 @@ export default function Practice() {
     return () => timers.forEach(clearTimeout);
   }, [submitting]);
 
+  // Handle answer submission for AI evaluation
   const handleSubmit = async () => {
     if (!userAnswer.trim()) return;
 
@@ -239,29 +85,21 @@ export default function Practice() {
       });
       setResult(data);
     } catch (err) {
-      const status = err.response?.status;
       const msg = err.response?.data?.message || 'Evaluation failed';
-
-      if (status === 503) {
-        setError("⚠️ Local Ollama service is offline. Please start it using 'ollama serve'.");
-      } else if (status === 404) {
-        setError("⚠️ AI model not found. Please run 'ollama pull' for required models.");
-      } else if (status === 504) {
-        setError('⏱ Evaluation timed out. Your machine may be under heavy load — please try again.');
-      } else {
-        setError(msg);
-      }
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Reset evaluation state to try again
   const handleReset = () => {
     setResult(null);
     setUserAnswer('');
     setError('');
   };
 
+  // 1. Loading Skeleton View
   if (loading) {
     return (
       <div className="min-h-screen">
@@ -277,6 +115,7 @@ export default function Practice() {
     );
   }
 
+  // 2. Error View
   if (error && !question) {
     return (
       <div className="min-h-screen">
@@ -284,10 +123,7 @@ export default function Practice() {
         <div className="max-w-3xl mx-auto px-4 pt-24 text-center">
           <div className="glass-card p-8">
             <p className="text-red-400 text-lg">{error}</p>
-            <button
-              onClick={() => navigate('/questions')}
-              className="btn-primary mt-4"
-            >
+            <button onClick={() => navigate('/questions')} className="btn-primary mt-4">
               ← Back to Questions
             </button>
           </div>
@@ -298,13 +134,13 @@ export default function Practice() {
 
   const diffColors = DIFFICULTY_COLORS[question?.difficulty] || DIFFICULTY_COLORS.easy;
   const typeColors = TYPE_COLORS[question?.type] || TYPE_COLORS.technical;
+  const hasOptions = Array.isArray(question?.options) && question.options.length > 0;
 
   return (
     <div className="min-h-screen">
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 pt-24 pb-16 page-enter">
-
-        {/* Back Button */}
+        {/* Back Navigation Link */}
         <button
           onClick={() => navigate('/questions')}
           className="flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors mb-6 text-sm"
@@ -315,10 +151,10 @@ export default function Practice() {
           Back to Questions
         </button>
 
-        {/* Question Card */}
+        {/* Question Details Header Card */}
         <div className="glass-card p-6 md:p-8 mb-6">
           <div className="flex flex-wrap gap-2 mb-4">
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-400`}>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-400">
               {question.role}
             </span>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeColors.bg} ${typeColors.text}`}>
@@ -328,186 +164,37 @@ export default function Practice() {
               {question.difficulty}
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-100 leading-relaxed">
-            {question.text}
-          </h1>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-100 leading-relaxed">{question.text}</h1>
         </div>
 
-        {/* ─── Answer Area or Loading or Results ─── */}
-
+        {/* ── Dynamic State Rendering ── */}
         {submitting ? (
-          <LoadingCard currentStep={loadingStep} />
+          /* STATE A: Evaluating Answer Loading Card */
+          <EvaluationLoadingCard currentStep={loadingStep} />
         ) : result ? (
-          /* ─── Results Scorecard ─── */
-          result.isMcq || (question?.options && question.options.length > 0) ? (
-            /* ─── Clean MCQ Result Scorecard ─── */
-            <div className="space-y-6 page-enter">
-              <div className="glass-card p-6 md:p-8 text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <ScoreRing 
-                    score={result.overallScore} 
-                    size={140} 
-                    stroke={10} 
-                    label={result.overallScore === 100 ? "100% Correct" : "0% Incorrect"} 
-                  />
-                  <div>
-                    <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold ${
-                      result.overallScore === 100
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                    }`}>
-                      {result.overallScore === 100 ? '🎉 Correct Answer!' : '❌ Incorrect Selection'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    ⏱ Evaluated instantly in {result.latency?.total || 5}ms
-                  </p>
-                </div>
-              </div>
-
-              {/* Feedback Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FeedbackCard
-                  title="Status"
-                  items={result.strengths?.length > 0 ? result.strengths : result.weaknesses}
-                  icon={result.overallScore === 100 ? "✅" : "⚠️"}
-                  colorClass={result.overallScore === 100 ? "text-emerald-400" : "text-amber-400"}
-                />
-                <FeedbackCard
-                  title={result.overallScore === 100 ? "Explanation" : "Correct Option"}
-                  items={result.missingPoints?.length > 0 ? result.missingPoints : result.suggestions}
-                  icon="🎯"
-                  colorClass="text-indigo-400"
-                />
-              </div>
-
-              {/* Try Again */}
-              <div className="flex gap-3">
-                <button onClick={handleReset} className="btn-primary flex-1">
-                  🔄 Try Again
-                </button>
-                <button
-                  onClick={() => navigate('/questions')}
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 transition-all font-medium"
-                >
-                  ← Back to Questions
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* ─── Standard Descriptive Results Scorecard ─── */
-            <div className="space-y-6 page-enter">
-
-              {/* Overall Score + Metrics Row */}
-              <div className="glass-card p-6 md:p-8">
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  {/* Score Ring */}
-                  <ScoreRing score={result.overallScore} size={140} stroke={10} label="Overall Score" />
-
-                  {/* Metrics */}
-                  <div className="flex-1 w-full space-y-4">
-                    <MetricBar label="Keyword Coverage" value={result.keywordScore} icon="🔑" />
-                    <MetricBar
-                      label="Semantic Similarity"
-                      value={Math.round((result.semanticSimilarity || 0) * 100)}
-                      icon="🧬"
-                    />
-                    <MetricBar label="AI Evaluation" value={result.llmScore} icon="🤖" />
-                  </div>
-                </div>
-
-                {/* Latency Stats */}
-                {result.latency && (
-                  <div className="mt-6 pt-4 border-t border-white/10 flex flex-wrap gap-4 text-xs text-slate-500">
-                    <span>⚡ Embedding: {result.latency.embedding}ms</span>
-                    <span>🧠 LLM: {(result.latency.llm / 1000).toFixed(1)}s</span>
-                    <span>⏱ Total: {(result.latency.total / 1000).toFixed(1)}s</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Keywords */}
-              {(result.matchedKeywords?.length > 0 || result.missingKeywords?.length > 0) && (
-                <div className="glass-card p-5">
-                  <h4 className="text-sm font-semibold text-slate-300 mb-3">🔑 Keyword Analysis</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {result.matchedKeywords?.map((kw, i) => (
-                      <span
-                        key={`m-${i}`}
-                        className="px-2.5 py-1 text-xs rounded-full bg-emerald-500/15 text-emerald-400 font-medium"
-                      >
-                        ✓ {kw}
-                      </span>
-                    ))}
-                    {result.missingKeywords?.map((kw, i) => (
-                      <span
-                        key={`x-${i}`}
-                        className="px-2.5 py-1 text-xs rounded-full bg-red-500/15 text-red-400 font-medium"
-                      >
-                        ✗ {kw}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Feedback Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FeedbackCard
-                  title="Strengths"
-                  items={result.strengths}
-                  icon="💪"
-                  colorClass="text-emerald-400"
-                />
-                <FeedbackCard
-                  title="Weaknesses"
-                  items={result.weaknesses}
-                  icon="⚠️"
-                  colorClass="text-amber-400"
-                />
-                <FeedbackCard
-                  title="Missing Points"
-                  items={result.missingPoints}
-                  icon="❌"
-                  colorClass="text-red-400"
-                />
-                <FeedbackCard
-                  title="Suggestions"
-                  items={result.suggestions}
-                  icon="💡"
-                  colorClass="text-indigo-400"
-                />
-              </div>
-
-              {/* Try Again */}
-              <div className="flex gap-3">
-                <button onClick={handleReset} className="btn-primary flex-1">
-                  🔄 Try Again
-                </button>
-                <button
-                  onClick={() => navigate('/questions')}
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 transition-all font-medium"
-                >
-                  ← Back to Questions
-                </button>
-              </div>
-            </div>
-          )
+          /* STATE B: Evaluation Scorecard Result View */
+          <EvaluationResultScorecard
+            result={result}
+            question={question}
+            onReset={handleReset}
+            onNavigateBack={() => navigate('/questions')}
+          />
         ) : (
-          /* ─── Answer Input ─── */
+          /* STATE C: User Answer Input Form (MCQ or Text Area) */
           <div className="glass-card p-6 md:p-8">
             <label className="block text-sm font-medium text-slate-300 mb-3">
-              {Array.isArray(question.options) && question.options.length > 0 ? 'Select Your Answer' : 'Your Answer'}
+              {hasOptions ? 'Select Your Answer' : 'Your Answer'}
             </label>
 
-            {/* MCQ Options Selector vs Text Area */}
-            {Array.isArray(question.options) && question.options.length > 0 ? (
+            {hasOptions ? (
+              /* MCQ Options Selector Grid */
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {question.options.map((opt, i) => {
                   const letter = String.fromCharCode(65 + i);
-                  const isSelected = userAnswer.trim().toLowerCase() === opt.toLowerCase() || 
-                                     userAnswer.trim().toUpperCase() === letter ||
-                                     userAnswer.trim() === String(i);
+                  const isSelected =
+                    userAnswer.trim().toLowerCase() === opt.toLowerCase() ||
+                    userAnswer.trim().toUpperCase() === letter ||
+                    userAnswer.trim() === String(i);
                   return (
                     <button
                       key={i}
@@ -519,9 +206,11 @@ export default function Practice() {
                           : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20'
                       }`}
                     >
-                      <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
-                        isSelected ? 'bg-indigo-500 text-white' : 'bg-white/10 text-slate-400'
-                      }`}>
+                      <span
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
+                          isSelected ? 'bg-indigo-500 text-white' : 'bg-white/10 text-slate-400'
+                        }`}
+                      >
                         {letter}
                       </span>
                       <span className="text-sm font-medium flex-1 leading-snug">{opt}</span>
@@ -530,6 +219,7 @@ export default function Practice() {
                 })}
               </div>
             ) : (
+              /* Descriptive Answer Textarea */
               <>
                 <textarea
                   value={userAnswer}
@@ -538,23 +228,18 @@ export default function Practice() {
                   rows={10}
                   className="input-field resize-y min-h-[200px] text-sm leading-relaxed"
                 />
-
-                {/* Word count */}
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-xs text-slate-500">
                     {userAnswer.trim().split(/\s+/).filter(Boolean).length} words
                   </span>
-                  {error && (
-                    <span className="text-xs text-red-400">{error}</span>
-                  )}
+                  {error && <span className="text-xs text-red-400">{error}</span>}
                 </div>
               </>
             )}
 
-            {error && Array.isArray(question.options) && question.options.length > 0 && (
-              <p className="text-xs text-red-400 mt-3">{error}</p>
-            )}
+            {error && hasOptions && <p className="text-xs text-red-400 mt-3">{error}</p>}
 
+            {/* Submit Button */}
             <button
               onClick={handleSubmit}
               disabled={!userAnswer.trim() || submitting}
