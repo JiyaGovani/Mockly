@@ -73,16 +73,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background orbs */}
-      <div className="bg-orb w-96 h-96 bg-amber-300 top-[-8%] right-[-5%]" />
-      <div
-        className="bg-orb w-80 h-80 bg-orange-300 bottom-[-8%] left-[-5%]"
-        style={{ animationDelay: '2s' }}
-      />
-      <div
-        className="bg-orb w-48 h-48 bg-amber-200 top-[50%] left-[15%]"
-        style={{ animationDelay: '4s' }}
-      />
+
 
       <div
         className={`glass-card w-full max-w-md p-8 md:p-10 page-enter ${

@@ -103,7 +103,7 @@ export default function AptitudeWorkspace() {
     const { score, passed, correctCount, totalQuestions, attemptsUsed, attemptsRemaining, locked } = result;
 
     return (
-      <div className="min-h-screen bg-stone-50">
+      <div className="min-h-screen">
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-12 space-y-8">
           {/* Score card */}
@@ -201,7 +201,7 @@ export default function AptitudeWorkspace() {
 
   // ─── Active Test Workspace ───
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen">
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 py-8 flex gap-6">

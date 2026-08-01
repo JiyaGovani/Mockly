@@ -184,12 +184,12 @@ export default function MockInterview() {
   if (loading) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
+
         <Navbar />
         <div className="flex items-center justify-center h-[80vh]">
           <div className="text-center">
             <div className="spinner mx-auto mb-4" style={{ width: '3rem', height: '3rem' }} />
-            <p className="text-slate-400">Loading interview session...</p>
+            <p className="text-stone-500">Loading interview session...</p>
           </div>
         </div>
       </div>
@@ -200,13 +200,13 @@ export default function MockInterview() {
   if (submitting) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
+
         <Navbar />
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="glass-card p-10 text-center max-w-md">
             <div className="spinner mx-auto mb-6" style={{ width: '3rem', height: '3rem' }} />
-            <h2 className="text-xl font-bold text-slate-100 mb-2">Evaluating Your Answers</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-xl font-bold text-stone-800 mb-2">Evaluating Your Answers</h2>
+            <p className="text-stone-500 text-sm">
               AI is analyzing your responses. This may take a moment as each answer is evaluated
               for keywords, semantic similarity, and LLM scoring...
             </p>
@@ -225,8 +225,7 @@ export default function MockInterview() {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background */}
-      <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
-      <div className="bg-orb w-72 h-72 bg-violet-600 bottom-[10%] right-[-3%]" style={{ animationDelay: '3s' }} />
+
 
       <Navbar />
 
@@ -319,7 +318,7 @@ export default function MockInterview() {
               </div>
 
               {/* Question text */}
-              <h3 className="text-lg md:text-xl font-semibold text-slate-100 leading-relaxed mb-6">
+              <h3 className="text-lg md:text-xl font-semibold text-stone-900 leading-relaxed mb-6">
                 {currentQuestion.text}
               </h3>
 

@@ -42,7 +42,7 @@ export default function ScoreRing({ score, size = 120, stroke = 8, label }) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold text-slate-100">{score}</span>
+          <span className="text-2xl font-bold text-stone-900">{score}</span>
         </div>
       </div>
       {label && <span className="text-xs text-slate-400 font-medium">{label}</span>}

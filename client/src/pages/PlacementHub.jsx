@@ -156,19 +156,19 @@ function RoundCard({ round, roundData, isUnlocked, onStart, loading }) {
             {round.icon}
           </div>
           <div>
-            <h3 className="font-bold text-white text-lg leading-tight">{round.label} Round</h3>
-            <p className="text-xs text-slate-400 mt-0.5">{round.subtitle}</p>
+            <h3 className="font-bold text-stone-900 text-lg leading-tight">{round.label} Round</h3>
+            <p className="text-xs text-stone-600 mt-0.5">{round.subtitle}</p>
           </div>
         </div>
         <StatusBadge status={status} />
       </div>
 
       {/* Description */}
-      <p className="text-sm text-slate-400 leading-relaxed">{round.description}</p>
+      <p className="text-sm text-stone-700 leading-relaxed">{round.description}</p>
 
       {/* Pass score info */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-slate-500">Pass threshold: <span className="text-slate-300 font-medium">{round.passScore}%</span></span>
+        <span className="text-xs text-stone-600">Pass threshold: <span className="text-stone-800 font-medium">{round.passScore}%</span></span>
         {score !== null && <ScoreRing score={score} color={round.color} />}
       </div>
 
@@ -331,19 +331,19 @@ export default function PlacementHub() {
   const allPassed = attempt?.status === 'passed';
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen">
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
         {/* Page Header */}
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 border border-stone-200 rounded-2xl p-4 bg-white/60">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xl shadow-lg shadow-violet-500/30">
               🏆
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Placement Simulation</h1>
-              <p className="text-sm text-slate-400">Complete 3 rounds to simulate a real placement interview</p>
+              <h1 className="text-2xl font-bold text-stone-900">Placement Simulation</h1>
+              <p className="text-sm text-stone-600">Complete 3 rounds to simulate a real placement interview</p>
             </div>
           </div>
 
@@ -411,8 +411,8 @@ export default function PlacementHub() {
         {/* Tips section */}
         {!loadingStatus && (
           <div className="glass-card p-5 space-y-3">
-            <h3 className="text-sm font-semibold text-slate-300">📋 How it works</h3>
-            <ul className="space-y-1.5 text-sm text-slate-400">
+            <h3 className="text-sm font-semibold text-stone-800">📋 How it works</h3>
+            <ul className="space-y-1.5 text-sm text-stone-600">
               <li className="flex items-start gap-2">
                 <span className="text-orange-400 mt-0.5">①</span>
                 <span><span className="text-orange-300 font-medium">Aptitude</span> — Answer 10 MCQs. Score ≥ 70% to advance.</span>

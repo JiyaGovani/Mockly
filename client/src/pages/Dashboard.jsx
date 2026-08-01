@@ -73,8 +73,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen relative overflow-hidden pb-12">
       {/* Background orbs */}
-      <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
-      <div className="bg-orb w-72 h-72 bg-violet-600 bottom-[10%] right-[-3%]" style={{ animationDelay: '3s' }} />
+
 
       <Navbar />
 
@@ -82,7 +81,7 @@ export default function Dashboard() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-100 bg-gradient-to-r from-slate-100 to-slate-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-extrabold text-stone-900 bg-gradient-to-r from-stone-900 to-stone-600 bg-clip-text text-transparent">
               Progress Dashboard
             </h1>
             <p className="text-slate-400 text-sm mt-1">
@@ -120,12 +119,12 @@ export default function Dashboard() {
         ) : stats?.totalQuestionsPracticed === 0 ? (
           /* Empty state */
           <div className="glass-card p-12 text-center max-w-xl mx-auto mt-12 page-enter">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center mx-auto mb-6">
               <svg className="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-slate-100 mb-2">No Practice History Yet</h2>
+            <h2 className="text-xl font-bold text-stone-800 mb-2">No Practice History Yet</h2>
             <p className="text-slate-400 text-sm mb-6">
               Start practicing technical, behavioral, or HR questions to populate your visual charts.
             </p>
@@ -141,10 +140,10 @@ export default function Dashboard() {
               {/* Card 1 */}
               <div className="glass-card p-6 flex items-center justify-between hover:bg-white/10 transition-all duration-300">
                 <div>
-                  <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">Total Practiced</span>
-                  <h3 className="text-3xl font-extrabold text-slate-100 mt-1">{stats?.totalQuestionsPracticed}</h3>
+                  <span className="text-stone-500 text-xs font-semibold uppercase tracking-wider">Total Practiced</span>
+                  <h3 className="text-3xl font-extrabold text-stone-900 mt-1">{stats?.totalQuestionsPracticed}</h3>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <div className="w-12 h-12 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-800">
                   ✓
                 </div>
               </div>
@@ -152,7 +151,7 @@ export default function Dashboard() {
               <div className="glass-card p-6 flex items-center justify-between hover:bg-white/10 transition-all duration-300">
                 <div>
                   <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">Average Score</span>
-                  <h3 className="text-3xl font-extrabold text-slate-100 mt-1">{stats?.avgScore}%</h3>
+                  <h3 className="text-3xl font-extrabold text-stone-900 mt-1">{stats?.avgScore}%</h3>
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
                   %
@@ -162,7 +161,7 @@ export default function Dashboard() {
               <div className="glass-card p-6 flex items-center justify-between hover:bg-white/10 transition-all duration-300">
                 <div>
                   <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">Mock Sessions</span>
-                  <h3 className="text-3xl font-extrabold text-slate-100 mt-1">{stats?.activeSessions}</h3>
+                  <h3 className="text-3xl font-extrabold text-stone-900 mt-1">{stats?.activeSessions}</h3>
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
                   ⌛
@@ -235,7 +234,7 @@ export default function Dashboard() {
                       </div>
                       <button
                         onClick={() => navigate(`/practice/${q._id}`)}
-                        className="w-full py-2.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white text-xs font-semibold border border-indigo-500/20 hover:border-transparent transition-all duration-300"
+                        className="w-full py-2.5 rounded-lg bg-amber-900/10 hover:bg-amber-900 text-amber-900 hover:text-white text-xs font-semibold border border-amber-900/20 hover:border-transparent transition-all duration-300"
                       >
                         Practice Now →
                       </button>

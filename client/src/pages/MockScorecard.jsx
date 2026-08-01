@@ -46,7 +46,7 @@ function ScoreCircle({ score }) {
         />
       </svg>
       <div className="absolute text-center">
-        <p className="text-4xl font-bold text-slate-100">{score}%</p>
+        <p className="text-4xl font-bold text-stone-900">{score}%</p>
         <p className="text-xs text-slate-500">Overall Score</p>
       </div>
     </div>
@@ -199,7 +199,7 @@ export default function MockScorecard() {
   if (loading || !session) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
+
         <Navbar />
         <div className="flex items-center justify-center h-[80vh]">
           <div className="spinner" style={{ width: '3rem', height: '3rem' }} />
@@ -215,15 +215,14 @@ export default function MockScorecard() {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background */}
-      <div className="bg-orb w-96 h-96 bg-indigo-600 top-[-5%] left-[-5%]" />
-      <div className="bg-orb w-72 h-72 bg-violet-600 bottom-[10%] right-[-3%]" style={{ animationDelay: '3s' }} />
+
 
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-4 md:px-8 py-8 page-enter">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold text-slate-100 mb-2">Mock Interview Results</h1>
+          <h1 className="text-2xl font-bold text-stone-900 mb-2">Mock Interview Results</h1>
           <p className="text-slate-400 text-sm">
             {session.role} Session completed in {elapsed} minutes on{' '}
             {new Date(session.completedAt).toLocaleDateString()}
@@ -239,15 +238,15 @@ export default function MockScorecard() {
         <div className="grid grid-cols-3 gap-4 mb-10 max-w-xl mx-auto">
           <div className="glass-card p-4 text-center">
             <p className="text-xs text-slate-500 uppercase tracking-wider">Questions</p>
-            <p className="text-2xl font-bold text-slate-100 mt-1">{session.questions.length}</p>
+            <p className="text-2xl font-bold text-stone-900 mt-1">{session.questions.length}</p>
           </div>
           <div className="glass-card p-4 text-center">
             <p className="text-xs text-slate-500 uppercase tracking-wider">Time Taken</p>
-            <p className="text-2xl font-bold text-slate-100 mt-1">{elapsed} min</p>
+            <p className="text-2xl font-bold text-stone-900 mt-1">{elapsed} min</p>
           </div>
           <div className="glass-card p-4 text-center">
             <p className="text-xs text-slate-500 uppercase tracking-wider">Answered</p>
-            <p className="text-2xl font-bold text-slate-100 mt-1">
+            <p className="text-2xl font-bold text-stone-900 mt-1">
               {session.answers.filter((a) => a.userAnswer && a.userAnswer.trim() !== '').length}
             </p>
           </div>

@@ -44,16 +44,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background orbs */}
-      <div className="bg-orb w-96 h-96 bg-amber-300 top-[-10%] left-[-5%]" />
-      <div
-        className="bg-orb w-72 h-72 bg-orange-300 bottom-[-5%] right-[-5%]"
-        style={{ animationDelay: '3s' }}
-      />
-      <div
-        className="bg-orb w-56 h-56 bg-amber-200 top-[40%] right-[20%]"
-        style={{ animationDelay: '5s' }}
-      />
+
 
       <div
         className={`glass-card w-full max-w-md p-8 md:p-10 page-enter ${

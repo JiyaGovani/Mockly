@@ -36,7 +36,7 @@ export default function EvaluationLoadingCard({ currentStep }) {
     <div className="glass-card p-6 md:p-8 page-enter">
       <div className="flex items-center gap-3 mb-6">
         <div className="spinner" style={{ width: '1.5rem', height: '1.5rem' }} />
-        <h3 className="text-lg font-semibold text-slate-100">Evaluating your answer...</h3>
+        <h3 className="text-lg font-semibold text-stone-800">Evaluating your answer...</h3>
       </div>
 
       {/* Processing Steps */}

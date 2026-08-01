@@ -106,9 +106,9 @@ export default function Practice() {
         <Navbar />
         <div className="max-w-3xl mx-auto px-4 pt-24">
           <div className="glass-card p-8 animate-pulse">
-            <div className="h-5 w-24 rounded-full bg-white/10 mb-4" />
-            <div className="h-6 bg-white/10 rounded w-full mb-2" />
-            <div className="h-6 bg-white/10 rounded w-3/4" />
+            <div className="h-5 w-24 rounded-full bg-stone-200 mb-4" />
+            <div className="h-6 bg-stone-200 rounded w-full mb-2" />
+            <div className="h-6 bg-stone-200 rounded w-3/4" />
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@ export default function Practice() {
         {/* Back Navigation Link */}
         <button
           onClick={() => navigate('/questions')}
-          className="flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors mb-6 text-sm"
+          className="flex items-center gap-2 text-stone-500 hover:text-stone-800 transition-colors mb-6 text-sm"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -154,7 +154,7 @@ export default function Practice() {
         {/* Question Details Header Card */}
         <div className="glass-card p-6 md:p-8 mb-6">
           <div className="flex flex-wrap gap-2 mb-4">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-400">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
               {question.role}
             </span>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeColors.bg} ${typeColors.text}`}>
@@ -164,7 +164,7 @@ export default function Practice() {
               {question.difficulty}
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-100 leading-relaxed">{question.text}</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-stone-900 leading-relaxed">{question.text}</h1>
         </div>
 
         {/* ── Dynamic State Rendering ── */}
@@ -182,7 +182,7 @@ export default function Practice() {
         ) : (
           /* STATE C: User Answer Input Form (MCQ or Text Area) */
           <div className="glass-card p-6 md:p-8">
-            <label className="block text-sm font-medium text-slate-300 mb-3">
+            <label className="block text-sm font-medium text-stone-700 mb-3">
               {hasOptions ? 'Select Your Answer' : 'Your Answer'}
             </label>
 
@@ -202,13 +202,13 @@ export default function Practice() {
                       onClick={() => setUserAnswer(opt)}
                       className={`flex items-center gap-3 p-4 rounded-xl text-left border transition-all ${
                         isSelected
-                          ? 'bg-indigo-500/20 border-indigo-500 text-slate-100 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500'
-                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20'
+                          ? 'bg-amber-900/10 border-amber-900 text-stone-900 shadow-lg shadow-amber-900/10 ring-1 ring-amber-900'
+                          : 'bg-stone-100 border-stone-200 text-stone-700 hover:bg-stone-200 hover:border-stone-300'
                       }`}
                     >
                       <span
                         className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
-                          isSelected ? 'bg-indigo-500 text-white' : 'bg-white/10 text-slate-400'
+                          isSelected ? 'bg-amber-900 text-white' : 'bg-stone-200 text-stone-600'
                         }`}
                       >
                         {letter}
