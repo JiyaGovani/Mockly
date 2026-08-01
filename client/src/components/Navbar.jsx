@@ -42,6 +42,12 @@ export default function Navbar() {
               >
                 Dashboard
               </button>
+              <button
+                onClick={() => navigate('/placement')}
+                className="text-sm text-slate-400 hover:text-slate-100 font-medium transition-all duration-300"
+              >
+                Placement
+              </button>
             </div>
           )}
         </div>

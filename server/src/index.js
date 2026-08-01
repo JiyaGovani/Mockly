@@ -9,6 +9,8 @@ import questionsRouter from './routes/questions.js';
 import evaluationRouter from './routes/evaluation.js';
 import dashboardRouter from './routes/dashboard.js';
 import sessionsRouter from './routes/sessions.js';
+import placementRouter from './routes/placement.js';
+import adminRouter from './routes/admin.js';
 
 dotenv.config();
 
@@ -28,6 +30,8 @@ app.use('/api/questions', questionsRouter);
 app.use('/api/evaluation', evaluationRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/sessions', sessionsRouter);
+app.use('/api/placement', placementRouter);
+app.use('/api/admin', adminRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);

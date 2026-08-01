@@ -12,9 +12,9 @@ Mockly is built in 7 sequential phases starting from the foundational scaffoldin
 - [x] **Phase 1: Foundation** - Basic MERN setup, auth, database schema, role definitions, and initial question CRUD. (completed 2026-07-07)
 - [x] **Phase 2: Core AI Evaluation** - Integrates local Ollama LLM, embeds cosine similarity, and builds the hybrid scoring and feedback pipeline. (completed 2026-07-09)
 - [x] **Phase 3: Progress Dashboard** - Implements charts showing topic performance over time and a weak-area recommendations system. (completed 2026-07-09)
-- [ ] **Phase 4: Mock Interview Mode** - Implements timed multi-question interview sessions with automated timeout submissions and reports.
-- [ ] **Phase 5: 3-Round Interview Flow** - Builds placement simulation flow (Aptitude MCQ -> Tech -> HR) with gating and retry limits.
-- [ ] **Phase 6: Admin Panel** - Provides an admin interface to manage questions, roles, and view aggregate user statistics.
+- [x] **Phase 4: Mock Interview Mode** - Implements timed multi-question interview sessions with automated timeout submissions and reports. (completed 2026-07-09)
+- [x] **Phase 5: 3-Round Interview Flow** - Builds placement simulation flow (Aptitude MCQ -> Tech -> HR) with gating and retry limits. (completed 2026-07-31)
+- [x] **Phase 6: Admin Panel** - Provides an admin interface to manage questions, roles, and view aggregate user statistics. (completed 2026-07-31)
 - [ ] **Phase 7: Polish & Deploy** - Implements loading states, error boundaries, rate limiting, UI responsiveness, and documentation.
 
 ## Phase Details
@@ -69,8 +69,8 @@ Plans:
   3. Completion generates a complete summary scorecard with per-question breakdowns.
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01: InterviewSession model, session manager backend APIs, and session timer hooks
-- [ ] 04-02: Mock interview UI flow, question navigations, and post-session report cards
+- [x] 04-01: InterviewSession model, session manager backend APIs, and session timer hooks
+- [x] 04-02: Mock interview UI flow, question navigations, and post-session report cards
 
 ### Phase 5: 3-Round Interview Flow
 **Goal**: Add placement simulation flow (Aptitude -> Technical -> HR) with gating thresholds.
@@ -82,8 +82,8 @@ Plans:
   3. User has a limit of 3 retry attempts per round before locking.
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01: ThreeRoundAttempt model, Aptitude MCQ engine backend, and round gating middleware
-- [ ] 05-02: Interactive 3-round frontend screens (Aptitude test, Technical/HR flow, gates) and retry logic
+- [x] 05-01: ThreeRoundAttempt model, Aptitude MCQ engine backend, and round gating middleware
+- [x] 05-02: Interactive 3-round frontend screens (Aptitude test, Technical/HR flow, gates) and retry logic
 
 ### Phase 6: Admin Panel
 **Goal**: Create administration dashboard for system maintenance, question CRUD, and user monitoring.
@@ -95,8 +95,8 @@ Plans:
   3. Admin can view aggregate user metrics and list individual student progress logs.
 **Plans**: 2 plans
 Plans:
-- [ ] 06-01: Admin checks middleware, stats aggregators, and users progress viewer UI
-- [ ] 06-02: ManageQuestions CRUD UI forms and ManageRoles UI page
+- [x] 06-01: Admin checks middleware, stats aggregators, and users progress viewer UI
+- [x] 06-02: ManageQuestions CRUD UI forms and ManageRoles UI page
 
 ### Phase 7: Polish & Deploy
 **Goal**: Apply finishing UX polishes, add API rate limiting, refine mobile layouts, and prepare documentation.
@@ -121,7 +121,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Foundation | 3/3 | Complete    | 2026-07-07 |
 | 2. Core AI Evaluation | 3/3 | Complete    | 2026-07-09 |
 | 3. Progress Dashboard | 2/2 | Complete    | 2026-07-09 |
-| 4. Mock Interview Mode | 0/2 | Not started | - |
-| 5. 3-Round Interview Flow | 0/2 | Not started | - |
-| 6. Admin Panel | 0/2 | Not started | - |
+| 4. Mock Interview Mode | 2/2 | Complete    | 2026-07-09 |
+| 5. 3-Round Interview Flow | 2/2 | Complete    | 2026-07-31 |
+| 6. Admin Panel | 2/2 | Complete    | 2026-07-31 |
 | 7. Polish & Deploy | 0/2 | Not started | - |
