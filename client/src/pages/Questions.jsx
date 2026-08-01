@@ -264,32 +264,35 @@ export default function Questions() {
         </div>
 
         {/* Filters row */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          {/* Type dropdown */}
-          <select
-            value={activeType}
-            onChange={(e) => setActiveType(e.target.value)}
-            className="input-field w-auto min-w-[140px] text-sm py-2 px-3 cursor-pointer"
-          >
-            {TYPES.map((t) => (
-              <option key={t} value={t} className="bg-white text-stone-700">
-                {t === 'all' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1)}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-col md:flex-row gap-3 mb-6 items-stretch md:items-center">
+          {/* Side-by-side Dropdowns */}
+          <div className="flex gap-2 shrink-0">
+            {/* Type dropdown */}
+            <select
+              value={activeType}
+              onChange={(e) => setActiveType(e.target.value)}
+              className="bg-stone-100 hover:bg-stone-200 border border-stone-300 rounded-xl text-stone-700 text-sm py-2 px-3.5 focus:outline-none focus:ring-1 focus:ring-amber-900/40 cursor-pointer shadow-sm min-w-[140px] transition-all"
+            >
+              {TYPES.map((t) => (
+                <option key={t} value={t} className="bg-white text-stone-700">
+                  {t === 'all' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1)}
+                </option>
+              ))}
+            </select>
 
-          {/* Difficulty dropdown */}
-          <select
-            value={activeDifficulty}
-            onChange={(e) => setActiveDifficulty(e.target.value)}
-            className="input-field w-auto min-w-[140px] text-sm py-2 px-3 cursor-pointer"
-          >
-            {DIFFICULTIES.map((d) => (
-              <option key={d} value={d} className="bg-white text-stone-700">
-                {d === 'all' ? 'All Difficulties' : d.charAt(0).toUpperCase() + d.slice(1)}
-              </option>
-            ))}
-          </select>
+            {/* Difficulty dropdown */}
+            <select
+              value={activeDifficulty}
+              onChange={(e) => setActiveDifficulty(e.target.value)}
+              className="bg-stone-100 hover:bg-stone-200 border border-stone-300 rounded-xl text-stone-700 text-sm py-2 px-3.5 focus:outline-none focus:ring-1 focus:ring-amber-900/40 cursor-pointer shadow-sm min-w-[140px] transition-all"
+            >
+              {DIFFICULTIES.map((d) => (
+                <option key={d} value={d} className="bg-white text-stone-700">
+                  {d === 'all' ? 'All Difficulties' : d.charAt(0).toUpperCase() + d.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Search */}
           <div className="flex-1 min-w-[200px]">
@@ -298,7 +301,7 @@ export default function Questions() {
               placeholder="Search questions…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input-field text-sm py-2 px-3"
+              className="input-field text-sm py-2 px-3 w-full"
             />
           </div>
         </div>
