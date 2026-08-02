@@ -6,6 +6,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Questions from './pages/Questions';
@@ -83,7 +84,7 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Home />} />
           <Route
             path="/register"
             element={
