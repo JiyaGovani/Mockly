@@ -8,6 +8,13 @@ const APTITUDE_PASS_SCORE = 70;
 const TECHNICAL_PASS_SCORE = 75;
 const HR_PASS_SCORE = 70;
 
+/** Pass score map for unlock evaluation */
+const PASS_SCORES = {
+  aptitude: APTITUDE_PASS_SCORE,
+  technical: TECHNICAL_PASS_SCORE,
+  hr: HR_PASS_SCORE,
+};
+
 /* ─── Helpers ──────────────────────────────────────────────────────────── */
 
 /**
@@ -636,3 +643,323 @@ export async function submitHr(req, res) {
     return res.status(500).json({ message: 'Server error submitting HR round' });
   }
 }
+
+/* ─── Unlock Controllers ────────────────────────────────────────────────── */
+
+/**
+ * POST /api/placement/unlock/start
+ * Start a dedicated Unlock Mock Interview for a locked placement round.
+ * Body: { role, roundKey }
+ * - roundKey: 'aptitude' | 'technical' | 'hr'
+ *
+ * For 'aptitude': returns 10 MCQ questions (same as regular aptitude).
+ * For 'technical'/'hr': creates a fresh InterviewSession and returns it.
+ */
+export async function startUnlockSession(req, res) {
+  try {
+    const { role, roundKey } = req.body;
+    if (!role || !roundKey) {
+      return res.status(400).json({ message: 'Role and roundKey are required' });
+    }
+    if (!['aptitude', 'technical', 'hr'].includes(roundKey)) {
+      return res.status(400).json({ message: 'Invalid roundKey. Must be aptitude, technical, or hr.' });
+    }
+
+    const attempt = await ThreeRoundAttempt.findOne({
+      user: req.user._id,
+      role: role.toUpperCase(),
+    });
+
+    if (!attempt) {
+      return res.status(404).json({ message: 'No placement attempt found for this role.' });
+    }
+
+    if (!attempt.rounds[roundKey].locked) {
+      return res.status(400).json({
+        message: `The ${roundKey} round is not locked. Unlock is only available for locked rounds.`,
+      });
+    }
+
+    // ── Aptitude Unlock: return 10 MCQ questions directly ──
+    if (roundKey === 'aptitude') {
+      const questions = await selectAptitudeQuestions(role);
+      if (questions.length === 0) {
+        return res.status(404).json({
+          message: `No aptitude questions found for role: ${role}.`,
+        });
+      }
+      return res.status(200).json({
+        message: 'Aptitude unlock session started',
+        isUnlockSession: true,
+        roundKey,
+        role: role.toUpperCase(),
+        questions,
+      });
+    }
+
+    // ── Technical / HR Unlock: create an InterviewSession ──
+    let questionIds;
+    if (roundKey === 'technical') {
+      questionIds = await selectTechnicalQuestions(role);
+    } else {
+      questionIds = await selectHrQuestions(role);
+    }
+
+    if (questionIds.length === 0) {
+      return res.status(404).json({
+        message: `No ${roundKey} questions found for role: ${role}.`,
+      });
+    }
+
+    const answers = questionIds.map((qId) => ({ question: qId, userAnswer: '' }));
+
+    const session = await InterviewSession.create({
+      user: req.user._id,
+      role: role.toUpperCase(),
+      questions: questionIds,
+      answers,
+      status: 'active',
+      startedAt: new Date(),
+    });
+
+    const populated = await InterviewSession.findById(session._id).populate('questions');
+
+    return res.status(201).json({
+      message: `${roundKey.charAt(0).toUpperCase() + roundKey.slice(1)} unlock session started`,
+      isUnlockSession: true,
+      roundKey,
+      role: role.toUpperCase(),
+      session: populated,
+    });
+  } catch (err) {
+    console.error('Error starting unlock session:', err);
+    return res.status(500).json({ message: 'Server error starting unlock session' });
+  }
+}
+
+/**
+ * POST /api/placement/unlock/submit
+ * Submit an Unlock Mock Interview and potentially unlock the locked round.
+ *
+ * For aptitude: Body: { role, roundKey, answers: [{ questionId, selectedOption }] }
+ * For technical/hr: Body: { role, roundKey, sessionId }
+ *
+ * If score >= passThreshold:
+ *   - rounds[roundKey].locked = false
+ *   - rounds[roundKey].attemptsCount = 0
+ *   - attempt.status = 'in_progress'
+ * Otherwise: round remains locked.
+ */
+export async function submitUnlockSession(req, res) {
+  try {
+    const { role, roundKey, answers, sessionId } = req.body;
+    if (!role || !roundKey) {
+      return res.status(400).json({ message: 'Role and roundKey are required' });
+    }
+    if (!['aptitude', 'technical', 'hr'].includes(roundKey)) {
+      return res.status(400).json({ message: 'Invalid roundKey.' });
+    }
+
+    const attempt = await ThreeRoundAttempt.findOne({
+      user: req.user._id,
+      role: role.toUpperCase(),
+    });
+
+    if (!attempt) {
+      return res.status(404).json({ message: 'No placement attempt found for this role.' });
+    }
+
+    if (!attempt.rounds[roundKey].locked) {
+      return res.status(400).json({
+        message: `The ${roundKey} round is not locked. Nothing to unlock.`,
+      });
+    }
+
+    const passThreshold = PASS_SCORES[roundKey];
+    let score = 0;
+
+    // ── Aptitude Unlock: grade MCQ answers ──
+    if (roundKey === 'aptitude') {
+      if (!answers || !Array.isArray(answers) || answers.length === 0) {
+        return res.status(400).json({ message: 'Answers array is required for aptitude unlock.' });
+      }
+
+      const questionIds = answers.map((a) => a.questionId);
+      const questions = await Question.find({ _id: { $in: questionIds } });
+
+      let correctCount = 0;
+      for (const ans of answers) {
+        const question = questions.find((q) => q._id.toString() === ans.questionId);
+        if (question && question.correctOption === ans.selectedOption) {
+          correctCount++;
+        }
+      }
+
+      score = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
+    }
+
+    // ── Technical / HR Unlock: evaluate InterviewSession ──
+    if (roundKey === 'technical' || roundKey === 'hr') {
+      if (!sessionId) {
+        return res.status(400).json({ message: 'sessionId is required for technical/hr unlock.' });
+      }
+
+      const session = await InterviewSession.findOne({
+        _id: sessionId,
+        user: req.user._id,
+        status: 'active',
+      });
+
+      if (!session) {
+        return res.status(404).json({ message: 'Unlock session not found or already submitted.' });
+      }
+
+      session.status = 'completed';
+      session.completedAt = new Date();
+
+      // Evaluate answers
+      const evaluationPromises = session.answers.map(async (answer) => {
+        if (!answer.userAnswer || answer.userAnswer.trim() === '') {
+          answer.keywordScore = 0;
+          answer.embeddingScore = 0;
+          answer.llmScore = 0;
+          answer.overallScore = 0;
+          answer.weaknesses = ['No answer was provided'];
+          answer.suggestions = ['Provide an answer to receive feedback'];
+          return;
+        }
+        try {
+          const evaluation = await evaluateAttempt({
+            questionId: answer.question.toString(),
+            userAnswer: answer.userAnswer,
+          });
+
+          // HR uses LLM-heavy weights, Technical uses equal weights
+          const computedScore =
+            roundKey === 'hr'
+              ? Math.round(
+                  0.10 * (evaluation.keywordScore || 0) +
+                  0.20 * (evaluation.embeddingScore || 0) +
+                  0.70 * (evaluation.llmScore || 0)
+                )
+              : evaluation.overallScore;
+
+          Object.assign(answer, {
+            keywordScore: evaluation.keywordScore,
+            embeddingScore: evaluation.embeddingScore,
+            llmScore: evaluation.llmScore,
+            overallScore: computedScore,
+            matchedKeywords: evaluation.matchedKeywords || [],
+            missingKeywords: evaluation.missingKeywords || [],
+            strengths: evaluation.strengths || [],
+            weaknesses: evaluation.weaknesses || [],
+            missingPoints: evaluation.missingPoints || [],
+            suggestions: evaluation.suggestions || [],
+          });
+        } catch (evalErr) {
+          console.error(`Unlock eval failed for Q ${answer.question}:`, evalErr);
+          answer.overallScore = 0;
+          answer.weaknesses = ['AI evaluation failed'];
+        }
+      });
+
+      await Promise.all(evaluationPromises);
+
+      const scored = session.answers.filter((a) => a.overallScore !== null);
+      session.overallScore =
+        scored.length > 0
+          ? Math.round(scored.reduce((s, a) => s + a.overallScore, 0) / scored.length)
+          : 0;
+
+      await session.save();
+      score = session.overallScore;
+    }
+
+    // ── Determine unlock outcome ──
+    const unlocked = score >= passThreshold;
+
+    if (unlocked) {
+      attempt.rounds[roundKey].locked = false;
+      attempt.rounds[roundKey].attemptsCount = 0;
+      attempt.status = 'in_progress';
+      await attempt.save();
+    }
+
+    return res.status(200).json({
+      message: unlocked
+        ? `🎉 Unlock successful! The ${roundKey} round is now unlocked with fresh attempts.`
+        : `Score ${score}% is below the required ${passThreshold}%. Round remains locked.`,
+      unlocked,
+      score,
+      passThreshold,
+      roundKey,
+      attempt,
+    });
+  } catch (err) {
+    console.error('Error submitting unlock session:', err);
+    return res.status(500).json({ message: 'Server error submitting unlock session' });
+  }
+}
+
+/**
+ * POST /api/placement/reset
+ * Resets a user's placement attempt for a role back to initial in_progress state,
+ * clearing scores, attempts, and locked states across all 3 rounds.
+ * Body: { role }
+ */
+export async function resetPlacementAttempt(req, res) {
+  try {
+    const { role } = req.body;
+    if (!role) {
+      return res.status(400).json({ message: 'Role is required' });
+    }
+
+    const attempt = await ThreeRoundAttempt.findOne({
+      user: req.user._id,
+      role: role.toUpperCase(),
+    });
+
+    if (!attempt) {
+      return res.status(404).json({ message: 'No placement attempt found for this role.' });
+    }
+
+    attempt.status = 'in_progress';
+    attempt.rounds.aptitude = {
+      attemptsCount: 0,
+      passed: false,
+      score: null,
+      completedAt: null,
+      answers: [],
+      questions: [],
+      locked: false,
+    };
+    attempt.rounds.technical = {
+      attemptsCount: 0,
+      passed: false,
+      score: null,
+      completedAt: null,
+      sessionId: null,
+      locked: false,
+    };
+    attempt.rounds.hr = {
+      attemptsCount: 0,
+      passed: false,
+      score: null,
+      completedAt: null,
+      sessionId: null,
+      locked: false,
+    };
+
+    await attempt.save();
+
+    return res.status(200).json({
+      message: 'Placement attempt reset successfully. You can now re-attempt all rounds.',
+      attempt,
+    });
+  } catch (err) {
+    console.error('Error resetting placement attempt:', err);
+    return res.status(500).json({ message: 'Server error resetting placement attempt' });
+  }
+}
+
+

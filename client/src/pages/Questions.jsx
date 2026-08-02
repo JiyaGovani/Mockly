@@ -151,15 +151,33 @@ export default function Questions() {
   const [showMockModal, setShowMockModal] = useState(false);
   const [mockRole, setMockRole] = useState('');
   const [startingMock, setStartingMock] = useState(false);
+  const [activeSessionPrompt, setActiveSessionPrompt] = useState(null);
 
-  const startMockInterview = async () => {
-    if (!mockRole) return;
+  const startMockInterview = async (forceFresh = false) => {
+    const roleToUse = mockRole || (activeSessionPrompt ? activeSessionPrompt.role : (roles.length > 0 ? roles[0].name : 'SDE'));
     setStartingMock(true);
     try {
-      const { data } = await api.post('/sessions/start', { role: mockRole });
-      navigate(`/mock/${data.session._id}`);
+      const { data } = await api.post('/sessions/start', {
+        role: roleToUse,
+        forceFresh,
+      });
+
+      if (data.activeSessionExists && !forceFresh) {
+        setActiveSessionPrompt(data.session);
+        setShowMockModal(false);
+        setStartingMock(false);
+        return;
+      }
+
+      setActiveSessionPrompt(null);
+      setShowMockModal(false);
+      setStartingMock(false);
+      if (data.session && data.session._id) {
+        navigate(`/mock/${data.session._id}`);
+      }
     } catch (err) {
       console.error('Failed to start mock:', err);
+      alert(err.response?.data?.message || 'Error starting mock interview session');
       setStartingMock(false);
     }
   };
@@ -218,33 +236,21 @@ export default function Questions() {
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 page-enter">
         {/* Page header */}
-        <div className="mb-6 flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-stone-900">Question Bank</h1>
-            <p className="text-stone-500 text-sm mt-1">
-              Browse interview questions by role, type, and difficulty
-            </p>
-          </div>
-          <button
-            onClick={() => setShowMockModal(true)}
-            className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all flex items-center gap-2 flex-shrink-0"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Start Mock Interview
-          </button>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-stone-900">Practice Questions</h1>
+          <p className="text-stone-500 text-sm mt-1">
+            Browse interview questions by role, type, and difficulty
+          </p>
         </div>
 
         {/* Role tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
           <button
             onClick={() => setActiveRole('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-              activeRole === 'all'
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${activeRole === 'all'
                 ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
                 : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-800 border border-stone-300'
-            }`}
+              }`}
           >
             All Roles
           </button>
@@ -252,11 +258,10 @@ export default function Questions() {
             <button
               key={role._id}
               onClick={() => setActiveRole(role.name)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-                activeRole === role.name
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${activeRole === role.name
                   ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
                   : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-800 border border-stone-300'
-              }`}
+                }`}
             >
               {role.displayName}
             </button>
@@ -440,8 +445,8 @@ export default function Questions() {
             </select>
 
             <button
-              onClick={startMockInterview}
-              disabled={!mockRole || startingMock}
+              onClick={() => startMockInterview(false)}
+              disabled={startingMock}
               className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {startingMock ? (
@@ -462,6 +467,52 @@ export default function Questions() {
           </div>
         </div>
       )}
+
+      {/* Option B: Active Session Resume vs Start Fresh Modal */}
+      {activeSessionPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setActiveSessionPrompt(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="glass-card relative w-full max-w-md p-6 md:p-8 page-enter" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setActiveSessionPrompt(null)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 transition-all"
+            >
+              ✕
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-700 flex items-center justify-center text-2xl mb-4 font-bold">
+              ⏱
+            </div>
+
+            <h2 className="text-lg font-bold text-stone-900 mb-2">Active Session Found</h2>
+            <p className="text-sm text-stone-600 mb-6">
+              You already have an active <strong>{activeSessionPrompt.role}</strong> mock interview session in progress. Would you like to resume it or start a fresh session?
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  const sessId = activeSessionPrompt._id;
+                  setActiveSessionPrompt(null);
+                  navigate(`/mock/${sessId}`);
+                }}
+                className="btn-primary w-full flex items-center justify-center gap-2 py-3"
+              >
+                🔄 Resume Active Interview
+              </button>
+
+              <button
+                onClick={() => startMockInterview(true)}
+                disabled={startingMock}
+                className="w-full px-4 py-3 rounded-xl border border-stone-300 text-stone-700 font-semibold hover:bg-stone-100 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {startingMock ? 'Starting Fresh...' : '🗑️ Cancel & Start Fresh Interview'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

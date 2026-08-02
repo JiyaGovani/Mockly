@@ -123,7 +123,7 @@ function ScoreRing({ score, color }) {
 }
 
 // ─── Round Card ───
-function RoundCard({ round, roundData, isUnlocked, onStart, loading }) {
+function RoundCard({ round, roundData, isUnlocked, onStart, onUnlock, loading, unlockLoading }) {
   const attempts = roundData?.attemptsCount ?? 0;
   const passed = roundData?.passed ?? false;
   const locked = roundData?.locked ?? false;
@@ -173,39 +173,66 @@ function RoundCard({ round, roundData, isUnlocked, onStart, loading }) {
       </div>
 
       {/* Attempts */}
-      {attempts > 0 && (
+      {attempts > 0 && !locked && (
         <AttemptPips used={attempts} max={MAX_ATTEMPTS} />
       )}
 
-      {/* Action */}
-      <button
-        id={`btn-start-${round.key}`}
-        disabled={!canStart || loading}
-        onClick={() => onStart(round.key)}
-        className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-          passed
-            ? 'bg-emerald-100 text-emerald-800 cursor-default'
-            : locked
-            ? 'bg-stone-200 text-stone-600 cursor-not-allowed'
+      {/* ── LOCKED UNLOCK BANNER ── */}
+      {locked && (
+        <div className="rounded-xl border border-amber-400/30 bg-gradient-to-br from-amber-50 to-orange-50 p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">⚡</span>
+            <p className="text-sm font-semibold text-amber-900">
+              All 3 attempts used — round is locked
+            </p>
+          </div>
+          <p className="text-xs text-amber-800 leading-relaxed">
+            Complete a Mock Interview and score{' '}
+            <span className="font-bold">≥ {round.passScore}%</span> to unlock this round and get
+            3 fresh attempts.
+          </p>
+          <button
+            id={`btn-unlock-${round.key}`}
+            disabled={unlockLoading}
+            onClick={() => onUnlock(round.key)}
+            className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+              unlockLoading
+                ? 'bg-amber-200 text-amber-700 cursor-wait'
+                : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 hover:scale-[1.02] shadow-lg shadow-amber-500/25'
+            }`}
+          >
+            {unlockLoading ? 'Starting Unlock Interview…' : `⚡ Attempt Mock Interview to Unlock`}
+          </button>
+        </div>
+      )}
+
+      {/* Normal Action button (shown when not locked) */}
+      {!locked && (
+        <button
+          id={`btn-start-${round.key}`}
+          disabled={!canStart || loading}
+          onClick={() => onStart(round.key)}
+          className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+            passed
+              ? 'bg-emerald-100 text-emerald-800 cursor-default'
+              : !isUnlocked
+              ? 'bg-stone-100 text-stone-600 cursor-not-allowed border border-stone-200'
+              : loading
+              ? 'bg-amber-900/50 text-white cursor-wait'
+              : `bg-gradient-to-r ${round.color} text-white hover:opacity-90 hover:scale-[1.02] shadow-lg`
+          }`}
+        >
+          {passed
+            ? '✓ Round Completed'
             : !isUnlocked
-            ? 'bg-stone-100 text-stone-600 cursor-not-allowed border border-stone-200'
+            ? `🔐 Complete ${round.unlockRequires ? round.unlockRequires.charAt(0).toUpperCase() + round.unlockRequires.slice(1) : ''} Round First`
             : loading
-            ? 'bg-amber-900/50 text-white cursor-wait'
-            : `bg-gradient-to-r ${round.color} text-white hover:opacity-90 hover:scale-[1.02] shadow-lg`
-        }`}
-      >
-        {passed
-          ? '✓ Round Completed'
-          : locked
-          ? '🔒 Locked (Max Attempts Reached)'
-          : !isUnlocked
-          ? `🔐 Complete ${round.unlockRequires ? round.unlockRequires.charAt(0).toUpperCase() + round.unlockRequires.slice(1) : ''} Round First`
-          : loading
-          ? 'Starting…'
-          : attempts === 0
-          ? `Start ${round.label} Round`
-          : `Retry ${round.label} Round (Attempt ${attempts + 1}/${MAX_ATTEMPTS})`}
-      </button>
+            ? 'Starting…'
+            : attempts === 0
+            ? `Start ${round.label} Round`
+            : `Retry ${round.label} Round (Attempt ${attempts + 1}/${MAX_ATTEMPTS})`}
+        </button>
+      )}
     </div>
   );
 }
@@ -233,17 +260,27 @@ function RoleSelector({ selected, onChange }) {
 }
 
 // ─── Placement Complete Banner ───
-function PlacementCompleteBanner({ role }) {
+function PlacementCompleteBanner({ role, onReset, resetting }) {
   return (
-    <div className="glass-card p-8 text-center space-y-4 ring-1 ring-emerald-500/30 shadow-lg shadow-emerald-500/10">
+    <div className="glass-card p-8 text-center space-y-5 ring-1 ring-emerald-500/30 shadow-lg shadow-emerald-500/10">
       <div className="text-5xl">🎉</div>
       <h2 className="text-2xl font-bold text-stone-900">Placement Simulation Complete!</h2>
-      <p className="text-stone-650">
+      <p className="text-stone-650 max-w-lg mx-auto">
         You successfully cleared all 3 rounds of the <span className="text-stone-900 font-bold">{role}</span> placement simulation.
       </p>
-      <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-850 ring-1 ring-emerald-250">
-        ✓ All Rounds Passed
-      </span>
+      <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-850 ring-1 ring-emerald-250">
+          ✓ All Rounds Passed
+        </span>
+        <button
+          id="btn-reset-placement"
+          disabled={resetting}
+          onClick={onReset}
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-amber-800 to-amber-900 text-white hover:opacity-90 transition-all shadow-md hover:scale-[1.02] disabled:opacity-50"
+        >
+          {resetting ? 'Resetting…' : '🔄 Re-attempt All Rounds'}
+        </button>
+      </div>
     </div>
   );
 }
@@ -255,6 +292,8 @@ export default function PlacementHub() {
   const [attempt, setAttempt] = useState(null);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [startLoading, setStartLoading] = useState(null); // which round is starting
+  const [unlockLoading, setUnlockLoading] = useState(null); // which round is unlocking
+  const [resetting, setResetting] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchStatus = useCallback(async (role) => {
@@ -279,6 +318,19 @@ export default function PlacementHub() {
     setAttempt(null);
   };
 
+  const handleResetPlacement = async () => {
+    setResetting(true);
+    setError(null);
+    try {
+      await api.post('/placement/reset', { role: selectedRole });
+      await fetchStatus(selectedRole);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to reset placement rounds');
+    } finally {
+      setResetting(false);
+    }
+  };
+
   const handleStartRound = async (roundKey) => {
     setStartLoading(roundKey);
     setError(null);
@@ -289,7 +341,6 @@ export default function PlacementHub() {
           await fetchStatus(selectedRole);
           return;
         }
-        // Navigate to aptitude workspace with questions
         navigate('/placement/aptitude', {
           state: {
             role: selectedRole,
@@ -322,6 +373,48 @@ export default function PlacementHub() {
       await fetchStatus(selectedRole);
     } finally {
       setStartLoading(null);
+    }
+  };
+
+  /**
+   * Handle clicking "Attempt Mock Interview to Unlock" on a locked round.
+   * Calls /api/placement/unlock/start and navigates to the appropriate workspace.
+   */
+  const handleUnlockRound = async (roundKey) => {
+    setUnlockLoading(roundKey);
+    setError(null);
+    try {
+      const { data } = await api.post('/placement/unlock/start', {
+        role: selectedRole,
+        roundKey,
+      });
+
+      if (roundKey === 'aptitude') {
+        // Aptitude unlock → go to AptitudeWorkspace with isUnlockSession flag
+        navigate('/placement/aptitude', {
+          state: {
+            role: selectedRole,
+            questions: data.questions,
+            attempt: attempt,
+            isUnlockSession: true,
+            roundKey,
+          },
+        });
+      } else {
+        // Technical / HR unlock → go to MockInterview with isUnlock flag
+        navigate(`/mock/${data.session._id}`, {
+          state: {
+            placementRole: selectedRole,
+            placementRound: roundKey,
+            isUnlock: true,
+          },
+        });
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || `Failed to start unlock session for ${roundKey}`;
+      setError(msg);
+    } finally {
+      setUnlockLoading(null);
     }
   };
 
@@ -383,11 +476,17 @@ export default function PlacementHub() {
           </div>
         )}
 
-        {/* Placement Complete */}
-        {!loadingStatus && allPassed && <PlacementCompleteBanner role={selectedRole} />}
+        {/* Placement Complete Banner */}
+        {!loadingStatus && allPassed && (
+          <PlacementCompleteBanner
+            role={selectedRole}
+            onReset={handleResetPlacement}
+            resetting={resetting}
+          />
+        )}
 
         {/* Round Cards */}
-        {!loadingStatus && !allPassed && (
+        {!loadingStatus && (
           <div className="grid md:grid-cols-3 gap-5">
             {ROUNDS.map((round) => {
               const isUnlocked = round.unlockRequires
@@ -401,12 +500,15 @@ export default function PlacementHub() {
                   roundData={roundsData[round.key]}
                   isUnlocked={isUnlocked}
                   onStart={handleStartRound}
+                  onUnlock={handleUnlockRound}
                   loading={startLoading === round.key}
+                  unlockLoading={unlockLoading === round.key}
                 />
               );
             })}
           </div>
         )}
+
 
         {/* Tips section */}
         {!loadingStatus && (
@@ -428,6 +530,10 @@ export default function PlacementHub() {
               <li className="flex items-start gap-2 mt-1">
                 <span className="text-red-400 mt-0.5">⚠</span>
                 <span>Each round allows a maximum of 3 attempts. Failing 3 times locks that round.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-500 mt-0.5">⚡</span>
+                <span>Locked rounds can be unlocked by passing a <strong>Mock Interview</strong> at or above the round's pass threshold.</span>
               </li>
             </ul>
           </div>
