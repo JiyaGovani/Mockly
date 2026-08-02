@@ -17,12 +17,10 @@ export async function getEmbedding(text) {
     throw keyErr;
   }
 
-  let lastError = null;
-
-  for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
-    const client = getAIClient(keyIdx);
-
-    for (const modelName of FALLBACK_EMBED_MODELS) {
+  // Priority Loop: Primary Embedding Model tried across ALL Keys first before falling back
+  for (const modelName of FALLBACK_EMBED_MODELS) {
+    for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
+      const client = getAIClient(keyIdx);
       try {
         const model = client.getGenerativeModel({ model: modelName });
         const result = await model.embedContent(text);
@@ -32,23 +30,8 @@ export async function getEmbedding(text) {
         }
       } catch (err) {
         lastError = err;
-        const errMsg = (err.message || '').toLowerCase();
-
-        const isQuotaError = 
-          errMsg.includes('429') || 
-          errMsg.includes('quota') || 
-          errMsg.includes('resource_exhausted') ||
-          errMsg.includes('rate limit') ||
-          errMsg.includes('404') ||
-          errMsg.includes('not found') ||
-          errMsg.includes('503');
-
-        if (isQuotaError) {
-          console.warn(`⚠️ Embedding model '${modelName}' unavailable/rate-limited (Key #${keyIdx + 1}). Trying fallback embedding model...`);
-          continue;
-        }
-
-        throw err;
+        console.warn(`🔄 AUTO-SWITCH (Embedding): Key #${keyIdx + 1} (${GEMINI_API_KEYS[keyIdx]?.slice(0, 8)}...) / Model '${modelName}' failed with error: [${err.message}]. Trying next model/key...`);
+        continue;
       }
     }
   }
