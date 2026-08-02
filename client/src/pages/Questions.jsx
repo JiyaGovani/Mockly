@@ -151,15 +151,33 @@ export default function Questions() {
   const [showMockModal, setShowMockModal] = useState(false);
   const [mockRole, setMockRole] = useState('');
   const [startingMock, setStartingMock] = useState(false);
+  const [activeSessionPrompt, setActiveSessionPrompt] = useState(null);
 
-  const startMockInterview = async () => {
-    if (!mockRole) return;
+  const startMockInterview = async (forceFresh = false) => {
+    const roleToUse = mockRole || (activeSessionPrompt ? activeSessionPrompt.role : (roles.length > 0 ? roles[0].name : 'SDE'));
     setStartingMock(true);
     try {
-      const { data } = await api.post('/sessions/start', { role: mockRole });
-      navigate(`/mock/${data.session._id}`);
+      const { data } = await api.post('/sessions/start', {
+        role: roleToUse,
+        forceFresh,
+      });
+
+      if (data.activeSessionExists && !forceFresh) {
+        setActiveSessionPrompt(data.session);
+        setShowMockModal(false);
+        setStartingMock(false);
+        return;
+      }
+
+      setActiveSessionPrompt(null);
+      setShowMockModal(false);
+      setStartingMock(false);
+      if (data.session && data.session._id) {
+        navigate(`/mock/${data.session._id}`);
+      }
     } catch (err) {
       console.error('Failed to start mock:', err);
+      alert(err.response?.data?.message || 'Error starting mock interview session');
       setStartingMock(false);
     }
   };
@@ -440,8 +458,8 @@ export default function Questions() {
             </select>
 
             <button
-              onClick={startMockInterview}
-              disabled={!mockRole || startingMock}
+              onClick={() => startMockInterview(false)}
+              disabled={startingMock}
               className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {startingMock ? (
@@ -459,6 +477,51 @@ export default function Questions() {
                 </>
               )}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Option B: Active Session Resume vs Start Fresh Modal */}
+      {activeSessionPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setActiveSessionPrompt(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="glass-card relative w-full max-w-md p-6 md:p-8 page-enter" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setActiveSessionPrompt(null)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 transition-all"
+            >
+              ✕
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-700 flex items-center justify-center text-2xl mb-4 font-bold">
+              ⏱
+            </div>
+
+            <h2 className="text-lg font-bold text-stone-900 mb-2">Active Session Found</h2>
+            <p className="text-sm text-stone-600 mb-6">
+              You already have an active <strong>{activeSessionPrompt.role}</strong> mock interview session in progress. Would you like to resume it or start a fresh session?
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  const sessId = activeSessionPrompt._id;
+                  setActiveSessionPrompt(null);
+                  navigate(`/mock/${sessId}`);
+                }}
+                className="btn-primary w-full flex items-center justify-center gap-2 py-3"
+              >
+                🔄 Resume Active Interview
+              </button>
+
+              <button
+                onClick={() => startMockInterview(true)}
+                disabled={startingMock}
+                className="w-full px-4 py-3 rounded-xl border border-stone-300 text-stone-700 font-semibold hover:bg-stone-100 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {startingMock ? 'Starting Fresh...' : '🗑️ Cancel & Start Fresh Interview'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -89,9 +89,13 @@ export default function MockInterview() {
         const rem = Math.max(0, duration - elapsed);
         setRemaining(rem);
 
-        // If already completed, redirect to scorecard
+        // If completed, abandoned, or cancelled, redirect accordingly
         if (sess.status === 'completed') {
           navigate(`/mock/scorecard/${sess._id}`);
+          return;
+        }
+        if (sess.status === 'abandoned' || sess.status === 'cancelled') {
+          navigate('/questions');
           return;
         }
 
@@ -102,6 +106,21 @@ export default function MockInterview() {
       }
     })();
   }, [id, navigate]);
+
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancelSession = async () => {
+    if (!session) return;
+    setCancelling(true);
+    try {
+      await api.post(`/sessions/${session._id}/cancel`);
+      navigate('/questions');
+    } catch (err) {
+      console.error('Failed to cancel session:', err);
+      setCancelling(false);
+    }
+  };
 
   // Countdown timer
   useEffect(() => {
@@ -313,9 +332,15 @@ export default function MockInterview() {
             }`}>
               {formatTime(remaining)}
             </p>
-            <p className="text-xs text-stone-550 mt-2">
+            <p className="text-xs text-stone-550 mt-2 mb-3">
               {answeredCount}/{session.questions.length} answered
             </p>
+            <button
+              onClick={() => setShowCancelModal(true)}
+              className="w-full px-3 py-2 rounded-lg bg-stone-100 border border-stone-300 text-stone-700 text-xs font-semibold hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all flex items-center justify-center gap-1.5"
+            >
+              <span>🚪</span> Exit / Cancel Interview
+            </button>
           </div>
         </aside>
 
@@ -355,6 +380,7 @@ export default function MockInterview() {
                     const isSelected = currentAns.toLowerCase() === opt.toLowerCase() ||
                                        currentAns.toUpperCase() === letter ||
                                        currentAns === String(i);
+
                     return (
                       <button
                         key={i}
@@ -434,6 +460,46 @@ export default function MockInterview() {
           </div>
         </main>
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowCancelModal(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="glass-card relative w-full max-w-md p-6 md:p-8 page-enter" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowCancelModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 transition-all"
+            >
+              ✕
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-red-500/15 text-red-600 flex items-center justify-center text-2xl mb-4 font-bold">
+              ⚠️
+            </div>
+
+            <h2 className="text-lg font-bold text-stone-900 mb-2">Cancel Mock Interview?</h2>
+            <p className="text-sm text-stone-600 mb-6">
+              Are you sure you want to exit and cancel this session? Your interview progress for this round will be discarded.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-stone-300 text-stone-700 font-semibold hover:bg-stone-100 transition-all text-sm"
+              >
+                Continue Interview
+              </button>
+              <button
+                onClick={handleCancelSession}
+                disabled={cancelling}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition-all text-sm disabled:opacity-50"
+              >
+                {cancelling ? 'Cancelling...' : 'Yes, Cancel Session'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
