@@ -166,6 +166,167 @@ If the student's answer is empty, completely incorrect, off-topic, or contains n
   throw lastError || new Error('All Gemini evaluation models failed due to rate limits.');
 }
 
+/**
+ * Evaluate multiple student answers in 1 SINGLE Gemini API Call with Key Rotation & Fallbacks.
+ *
+ * @param {object} params
+ * @param {Array<{ questionId: string, questionText: string, expectedAnswer: string, userAnswer: string, matchedKeywords: string[], missingKeywords: string[], semanticSimilarity: number }>} params.items
+ * @returns {Promise<Map<string, { score: number, rubric: object, strengths: string[], weaknesses: string[], missingPoints: string[], suggestions: string[] }>>}
+ */
+export async function evaluateBatchAnswers({ items = [] }) {
+  if (items.length === 0) return new Map();
+
+  if (GEMINI_API_KEYS.length === 0) {
+    const keyErr = new Error('GEMINI_API_KEY is missing or invalid in server/.env file');
+    keyErr.statusCode = 500;
+    throw keyErr;
+  }
+
+  const formattedItems = items.map((item, idx) => {
+    const similarityPercent = Math.round((item.semanticSimilarity || 0) * 100);
+    return `
+--- QUESTION ITEM #${idx + 1} ---
+[Question ID]: ${item.questionId}
+[Question Text]: ${item.questionText}
+[Expected Reference Answer]: ${item.expectedAnswer}
+[Student's Answer]: ${item.userAnswer}
+[Keywords Matched]: ${item.matchedKeywords.join(', ') || 'None'}
+[Keywords Missing]: ${item.missingKeywords.join(', ') || 'None'}
+[Semantic Cosine Similarity]: ${similarityPercent}%
+`;
+  }).join('\n');
+
+  const prompt = `
+You are an expert technical interviewer evaluating a student's responses for a mock interview session.
+You are given a list of interview question items with the question, reference answer, student's answer, and pre-calculated keyword/semantic similarity metrics.
+
+For EACH item, provide thorough, constructive technical feedback.
+Ensure sub-scores (0-100) for technicalAccuracy, completeness, and communication clarity are generated in the rubric object.
+Provide 2-3 specific bullet points for strengths, weaknesses, missingPoints, and actionable suggestions.
+If an answer is empty, off-topic, or nonsensical, assign a score of 0.
+
+Evaluate all ${items.length} items below and return the evaluations in the required JSON schema format matching each questionId.
+
+${formattedItems}
+`;
+
+  let lastError = null;
+
+  for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
+    const client = getAIClient(keyIdx);
+
+    for (const modelName of FALLBACK_MODELS) {
+      try {
+        const model = client.getGenerativeModel({
+          model: modelName,
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: 'application/json',
+            responseSchema: {
+              type: SchemaType.OBJECT,
+              properties: {
+                evaluations: {
+                  type: SchemaType.ARRAY,
+                  items: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                      questionId: {
+                        type: SchemaType.STRING,
+                        description: 'The exact questionId from the input item',
+                      },
+                      score: {
+                        type: SchemaType.INTEGER,
+                        description: 'Overall score from 0 to 100',
+                      },
+                      rubric: {
+                        type: SchemaType.OBJECT,
+                        properties: {
+                          technicalAccuracy: { type: SchemaType.INTEGER },
+                          completeness: { type: SchemaType.INTEGER },
+                          clarity: { type: SchemaType.INTEGER },
+                        },
+                        required: ['technicalAccuracy', 'completeness', 'clarity'],
+                      },
+                      strengths: {
+                        type: SchemaType.ARRAY,
+                        items: { type: SchemaType.STRING },
+                      },
+                      weaknesses: {
+                        type: SchemaType.ARRAY,
+                        items: { type: SchemaType.STRING },
+                      },
+                      missingPoints: {
+                        type: SchemaType.ARRAY,
+                        items: { type: SchemaType.STRING },
+                      },
+                      suggestions: {
+                        type: SchemaType.ARRAY,
+                        items: { type: SchemaType.STRING },
+                      },
+                    },
+                    required: ['questionId', 'score', 'rubric', 'strengths', 'weaknesses', 'missingPoints', 'suggestions'],
+                  },
+                },
+              },
+              required: ['evaluations'],
+            },
+          },
+        });
+
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
+        const parsed = JSON.parse(responseText);
+        const evalList = Array.isArray(parsed.evaluations) ? parsed.evaluations : [];
+
+        const resultMap = new Map();
+        for (const ev of evalList) {
+          const rubricObj = ev.rubric || {};
+          resultMap.set(ev.questionId, {
+            score: Math.min(100, Math.max(0, parseInt(ev.score) || 0)),
+            rubric: {
+              technicalAccuracy: Math.min(100, Math.max(0, parseInt(rubricObj.technicalAccuracy) || 0)),
+              completeness: Math.min(100, Math.max(0, parseInt(rubricObj.completeness) || 0)),
+              clarity: Math.min(100, Math.max(0, parseInt(rubricObj.clarity) || 0)),
+            },
+            strengths: Array.isArray(ev.strengths) ? ev.strengths : [],
+            weaknesses: Array.isArray(ev.weaknesses) ? ev.weaknesses : [],
+            missingPoints: Array.isArray(ev.missingPoints) ? ev.missingPoints : [],
+            suggestions: Array.isArray(ev.suggestions) ? ev.suggestions : [],
+          });
+        }
+
+        return resultMap;
+      } catch (err) {
+        lastError = err;
+        const errMsg = (err.message || '').toLowerCase();
+        const isQuotaError = 
+          errMsg.includes('429') || 
+          errMsg.includes('quota') || 
+          errMsg.includes('resource_exhausted') ||
+          errMsg.includes('rate limit') ||
+          errMsg.includes('503') ||
+          errMsg.includes('overloaded');
+
+        if (isQuotaError) {
+          console.warn(`⚠️ Batch Model '${modelName}' hit rate limit/quota (Key #${keyIdx + 1}). Auto-switching...`);
+          continue;
+        }
+
+        if (errMsg.includes('404') || errMsg.includes('not found')) {
+          console.warn(`⚠️ Batch Model '${modelName}' not found. Trying next fallback model...`);
+          continue;
+        }
+
+        throw err;
+      }
+    }
+  }
+
+  console.error('All fallback models and API keys exhausted for batch evaluation:', lastError?.message);
+  throw lastError || new Error('All Gemini evaluation models failed during batch evaluation.');
+}
+
 export default {
   evaluateAnswer,
+  evaluateBatchAnswers,
 };

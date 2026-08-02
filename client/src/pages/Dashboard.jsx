@@ -116,7 +116,7 @@ export default function Dashboard() {
               <div className="glass-card h-80 bg-stone-200" />
             </div>
           </div>
-        ) : stats?.totalQuestionsPracticed === 0 ? (
+        ) : stats?.totalQuestionsPracticed === 0 && (stats?.mockSessions || stats?.activeSessions || 0) === 0 ? (
           /* Empty state */
           <div className="glass-card p-12 text-center max-w-xl mx-auto mt-12 page-enter">
             <div className="w-16 h-16 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center mx-auto mb-6">

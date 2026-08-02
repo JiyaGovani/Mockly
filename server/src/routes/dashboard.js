@@ -29,13 +29,39 @@ router.get('/stats', protect, async (req, res) => {
       createdAt: { $gte: dateLimit }
     });
 
-    // Calculate core metrics
-    const totalQuestionsPracticed = new Set(attempts.map(a => a.question.toString())).size;
-    const avgScore = attempts.length > 0
-      ? Math.round(attempts.reduce((sum, a) => sum + a.overallScore, 0) / attempts.length)
+    // 2. Fetch mock interview sessions within time range
+    const sessions = await InterviewSession.find({
+      user: userId,
+      createdAt: { $gte: dateLimit }
+    });
+
+    // Combine questions practiced from single attempts + answered mock interview questions
+    const uniqueQuestionsSet = new Set(attempts.map(a => a.question.toString()));
+    sessions.forEach(sess => {
+      if (Array.isArray(sess.answers)) {
+        sess.answers.forEach(ans => {
+          if (ans.userAnswer && ans.userAnswer.trim() !== '') {
+            const qId = (ans.question._id || ans.question).toString();
+            uniqueQuestionsSet.add(qId);
+          }
+        });
+      }
+    });
+
+    const totalQuestionsPracticed = uniqueQuestionsSet.size;
+
+    // Calculate blended average score from practice attempts + completed mock sessions
+    const practiceScores = attempts.map(a => a.overallScore).filter(s => typeof s === 'number');
+    const mockScores = sessions
+      .filter(s => s.status === 'completed' && typeof s.overallScore === 'number')
+      .map(s => s.overallScore);
+
+    const allScores = [...practiceScores, ...mockScores];
+    const avgScore = allScores.length > 0
+      ? Math.round(allScores.reduce((sum, score) => sum + score, 0) / allScores.length)
       : 0;
 
-    // 2. Aggregate average score per topic for the Radar Chart
+    // Aggregate average score per topic for the Radar Chart
     const rawMastery = await PracticeAttempt.aggregate([
       { $match: { user: userId, createdAt: { $gte: dateLimit } } },
       {
@@ -64,7 +90,7 @@ router.get('/stats', protect, async (req, res) => {
       };
     });
 
-    // 3. Aggregate chronological sequential scores per topic for the Line Chart
+    // Aggregate chronological sequential scores per topic for the Line Chart
     const chronologicalAttempts = await PracticeAttempt.aggregate([
       { $match: { user: userId, createdAt: { $gte: dateLimit } } },
       {
@@ -103,16 +129,14 @@ router.get('/stats', protect, async (req, res) => {
 
     lineChartData.sort((a, b) => a.attemptIndex - b.attemptIndex);
 
-    // Count active mock interview sessions
-    const activeSessions = await InterviewSession.countDocuments({
-      user: userId,
-      status: 'active',
-    });
+    // Count total mock interview sessions (all attempted/completed sessions)
+    const mockSessionsCount = sessions.length;
 
     res.status(200).json({
       totalQuestionsPracticed,
       avgScore,
-      activeSessions,
+      activeSessions: mockSessionsCount,
+      mockSessions: mockSessionsCount,
       radarChartData,
       lineChartData,
     });
