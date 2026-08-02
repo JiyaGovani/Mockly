@@ -147,6 +147,44 @@ export default function Questions() {
   // Modal
   const [selectedQuestion, setSelectedQuestion] = useState(null);
 
+<<<<<<< HEAD
+=======
+  // Mock interview state
+  const [showMockModal, setShowMockModal] = useState(false);
+  const [mockRole, setMockRole] = useState('');
+  const [startingMock, setStartingMock] = useState(false);
+  const [activeSessionPrompt, setActiveSessionPrompt] = useState(null);
+
+  const startMockInterview = async (forceFresh = false) => {
+    const roleToUse = mockRole || (activeSessionPrompt ? activeSessionPrompt.role : (roles.length > 0 ? roles[0].name : 'SDE'));
+    setStartingMock(true);
+    try {
+      const { data } = await api.post('/sessions/start', {
+        role: roleToUse,
+        forceFresh,
+      });
+
+      if (data.activeSessionExists && !forceFresh) {
+        setActiveSessionPrompt(data.session);
+        setShowMockModal(false);
+        setStartingMock(false);
+        return;
+      }
+
+      setActiveSessionPrompt(null);
+      setShowMockModal(false);
+      setStartingMock(false);
+      if (data.session && data.session._id) {
+        navigate(`/mock/${data.session._id}`);
+      }
+    } catch (err) {
+      console.error('Failed to start mock:', err);
+      alert(err.response?.data?.message || 'Error starting mock interview session');
+      setStartingMock(false);
+    }
+  };
+
+>>>>>>> 4edffb255a90bf7d4f3060cb321980855f750d39
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => setSearchDebounced(search), 300);
@@ -379,6 +417,109 @@ export default function Questions() {
         question={selectedQuestion}
         onClose={() => setSelectedQuestion(null)}
       />
+<<<<<<< HEAD
+=======
+
+      {/* Mock Interview Modal */}
+      {showMockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowMockModal(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="glass-card relative w-full max-w-md p-6 md:p-8 page-enter" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowMockModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 hover:text-stone-850 transition-all"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-lg font-bold text-stone-900 mb-2">Start Mock Interview</h2>
+            <p className="text-sm text-stone-500 mb-6">
+              10 balanced questions • 45-minute timer • AI-graded scorecard
+            </p>
+
+            <label className="block text-sm font-medium text-stone-700 mb-2">Select Target Role</label>
+            <select
+              value={mockRole}
+              onChange={(e) => setMockRole(e.target.value)}
+              className="input-field w-full text-sm py-2.5 px-3 cursor-pointer mb-6 animate-none"
+            >
+              <option value="" className="bg-white text-stone-700">Choose a role...</option>
+              {roles.map((role) => (
+                <option key={role._id} value={role.name} className="bg-white text-stone-700">
+                  {role.displayName}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={() => startMockInterview(false)}
+              disabled={startingMock}
+              className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {startingMock ? (
+                <>
+                  <div className="spinner" style={{ width: '1rem', height: '1rem' }} />
+                  Starting...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Begin Interview
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Option B: Active Session Resume vs Start Fresh Modal */}
+      {activeSessionPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setActiveSessionPrompt(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="glass-card relative w-full max-w-md p-6 md:p-8 page-enter" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setActiveSessionPrompt(null)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 transition-all"
+            >
+              ✕
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-700 flex items-center justify-center text-2xl mb-4 font-bold">
+              ⏱
+            </div>
+
+            <h2 className="text-lg font-bold text-stone-900 mb-2">Active Session Found</h2>
+            <p className="text-sm text-stone-600 mb-6">
+              You already have an active <strong>{activeSessionPrompt.role}</strong> mock interview session in progress. Would you like to resume it or start a fresh session?
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  const sessId = activeSessionPrompt._id;
+                  setActiveSessionPrompt(null);
+                  navigate(`/mock/${sessId}`);
+                }}
+                className="btn-primary w-full flex items-center justify-center gap-2 py-3"
+              >
+                🔄 Resume Active Interview
+              </button>
+
+              <button
+                onClick={() => startMockInterview(true)}
+                disabled={startingMock}
+                className="w-full px-4 py-3 rounded-xl border border-stone-300 text-stone-700 font-semibold hover:bg-stone-100 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {startingMock ? 'Starting Fresh...' : '🗑️ Cancel & Start Fresh Interview'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+>>>>>>> 4edffb255a90bf7d4f3060cb321980855f750d39
     </div>
   );
 }

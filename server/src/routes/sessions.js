@@ -30,12 +30,14 @@ async function selectQuestions(role) {
   ];
 
   const selectedIds = [];
+  const targetRole = (role || '').trim().toUpperCase();
 
+  // Tier 1: Try exact role + bucket distribution matching
   for (const bucket of distribution) {
     const questions = await Question.aggregate([
       {
         $match: {
-          role: role.toUpperCase(),
+          role: targetRole,
           type: bucket.type,
           difficulty: bucket.difficulty,
           isActive: true,
@@ -47,19 +49,33 @@ async function selectQuestions(role) {
     selectedIds.push(...questions.map((q) => q._id));
   }
 
-  // Fallback: if we got fewer than 10, fill with random questions for the role
+  // Tier 2: Fill remaining slots from any questions matching the target role
   if (selectedIds.length < 10) {
-    const remaining = await Question.aggregate([
+    const roleFallback = await Question.aggregate([
       {
         $match: {
-          role: role.toUpperCase(),
+          role: targetRole,
           isActive: true,
           _id: { $nin: selectedIds },
         },
       },
       { $sample: { size: 10 - selectedIds.length } },
     ]);
-    selectedIds.push(...remaining.map((q) => q._id));
+    selectedIds.push(...roleFallback.map((q) => q._id));
+  }
+
+  // Tier 3: Global Fallback — Fill remaining slots from ANY active questions in database
+  if (selectedIds.length < 10) {
+    const globalFallback = await Question.aggregate([
+      {
+        $match: {
+          isActive: true,
+          _id: { $nin: selectedIds },
+        },
+      },
+      { $sample: { size: 10 - selectedIds.length } },
+    ]);
+    selectedIds.push(...globalFallback.map((q) => q._id));
   }
 
   return selectedIds;
@@ -71,7 +87,7 @@ async function selectQuestions(role) {
  */
 router.post('/start', protect, async (req, res) => {
   try {
-    const { role } = req.body;
+    const { role, forceFresh } = req.body;
     const userId = req.user._id;
 
     if (!role) {
@@ -85,12 +101,25 @@ router.post('/start', protect, async (req, res) => {
     });
 
     if (existingSession) {
-      // Return the existing active session so user can resume
-      const populated = await InterviewSession.findById(existingSession._id).populate('questions');
-      return res.status(200).json({
-        message: 'Resuming existing active session',
-        session: populated,
-      });
+      const durationMs = (existingSession.durationMinutes || 45) * 60 * 1000;
+      const elapsedMs = Date.now() - new Date(existingSession.startedAt).getTime();
+      const isExpired = elapsedMs >= durationMs;
+
+      if (isExpired || forceFresh) {
+        // Mark old session as abandoned so user can start a fresh interview
+        await InterviewSession.updateOne(
+          { _id: existingSession._id },
+          { $set: { status: 'abandoned', completedAt: new Date() } }
+        );
+      } else {
+        // Active non-expired session exists — return it with activeSessionExists flag
+        const populated = await InterviewSession.findById(existingSession._id).populate('questions');
+        return res.status(200).json({
+          message: 'Active mock interview session in progress',
+          activeSessionExists: true,
+          session: populated,
+        });
+      }
     }
 
     // Select 10 balanced questions
@@ -144,10 +173,49 @@ router.get('/active', protect, async (req, res) => {
       return res.status(200).json({ session: null });
     }
 
+    // Auto-abandon if 45-minute timer has expired
+    const durationMs = (session.durationMinutes || 45) * 60 * 1000;
+    const elapsedMs = Date.now() - new Date(session.startedAt).getTime();
+    if (elapsedMs >= durationMs) {
+      await InterviewSession.updateOne(
+        { _id: session._id },
+        { $set: { status: 'abandoned', completedAt: new Date() } }
+      );
+      return res.status(200).json({ session: null });
+    }
+
     res.status(200).json({ session });
   } catch (err) {
     console.error('Error fetching active session:', err);
     res.status(500).json({ message: 'Server error fetching session' });
+  }
+});
+
+/**
+ * POST /api/sessions/:id/cancel
+ * Explicitly cancel/abandon an active session.
+ */
+router.post('/:id/cancel', protect, async (req, res) => {
+  try {
+    const session = await InterviewSession.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+      status: 'active',
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: 'Active session not found' });
+    }
+
+    await InterviewSession.updateOne(
+      { _id: session._id },
+      { $set: { status: 'cancelled', completedAt: new Date() } }
+    );
+
+    res.status(200).json({ message: 'Session cancelled successfully' });
+  } catch (err) {
+    console.error('Error cancelling session:', err);
+    res.status(500).json({ message: 'Server error cancelling session' });
   }
 });
 
