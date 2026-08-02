@@ -8,7 +8,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login', { replace: true });
+    navigate('/', { replace: true });
   };
 
   return (
@@ -18,7 +18,10 @@ export default function Navbar() {
         <div className="flex items-center gap-8">
           <div
             className="flex items-center gap-2 cursor-pointer"
-            onClick={() => navigate('/questions')}
+            onClick={() => {
+              navigate('/');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           >
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-800 to-amber-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-amber-900/20">
               M

@@ -19,6 +19,7 @@
 
 html {
   overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 
 * {
@@ -173,4 +174,18 @@ body {
 .link-accent:hover {
   color: var(--mockly-accent);
   text-decoration: underline;
+}
+
+/* Infinite Marquee Loop Animation */
+@keyframes infiniteScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infiniteScroll {
+  animation: infiniteScroll 25s linear infinite;
 }
