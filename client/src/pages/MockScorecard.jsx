@@ -179,6 +179,10 @@ export default function MockScorecard() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Destructure unlock result if present (set by MockInterview when isUnlock=true)
+  const unlockResult = state?.unlockResult ?? null;
+  const isUnlockSession = state?.isUnlock ?? false;
+
   useEffect(() => {
     (async () => {
       try {
@@ -253,6 +257,33 @@ export default function MockScorecard() {
           </div>
         </div>
 
+        {/* Unlock result banner */}
+        {isUnlockSession && unlockResult && (
+          <div
+            className={`glass-card p-5 mb-6 ring-1 ${
+              unlockResult.unlocked
+                ? 'ring-emerald-500/30 bg-emerald-50/50'
+                : 'ring-amber-400/30 bg-amber-50/50'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{unlockResult.unlocked ? '🔓' : '🔒'}</span>
+              <div>
+                <p className="font-bold text-stone-900">
+                  {unlockResult.unlocked
+                    ? `${unlockResult.roundKey?.charAt(0).toUpperCase() + unlockResult.roundKey?.slice(1)} Round Unlocked!`
+                    : 'Unlock Attempt Failed'}
+                </p>
+                <p className="text-sm text-stone-600 mt-0.5">
+                  {unlockResult.unlocked
+                    ? `You scored ${unlockResult.score}% — the round is now unlocked with 3 fresh attempts.`
+                    : `You scored ${unlockResult.score}% — a score of ${unlockResult.passThreshold}% or higher is needed. Try again from the Placement Hub.`}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Question breakdown */}
         <h2 className="text-lg font-semibold text-stone-900 mb-4">Question Breakdown</h2>
         <div className="space-y-3">
@@ -266,13 +297,13 @@ export default function MockScorecard() {
 
         {/* Back button */}
         <div className="mt-10 text-center">
-          {state?.placementRound ? (
+          {(state?.placementRound || isUnlockSession) ? (
             <button
               id="btn-scorecard-back-to-placement"
               onClick={() => navigate('/placement')}
               className="px-6 py-3 rounded-lg bg-gradient-to-r from-amber-900 to-amber-700 text-white font-medium shadow-lg shadow-amber-900/25 hover:shadow-amber-900/40 transition-all"
             >
-              Back to Placement Hub
+              {isUnlockSession ? 'Back to Placement Hub' : 'Back to Placement Hub'}
             </button>
           ) : (
             <button

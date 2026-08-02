@@ -32,7 +32,13 @@ export default function AptitudeWorkspace() {
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const { role, questions: initialQuestions = [], attempt: initialAttempt } = state || {};
+  const {
+    role,
+    questions: initialQuestions = [],
+    attempt: initialAttempt,
+    isUnlockSession = false,
+    roundKey = 'aptitude',
+  } = state || {};
 
   const [questions, setQuestions] = useState(initialQuestions);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -78,10 +84,16 @@ export default function AptitudeWorkspace() {
       }));
 
       try {
-        const { data } = await api.post('/placement/aptitude/submit', {
-          role,
-          answers: answersPayload,
-        });
+        // Choose endpoint based on whether this is an unlock session
+        const endpoint = isUnlockSession
+          ? '/placement/unlock/submit'
+          : '/placement/aptitude/submit';
+
+        const payload = isUnlockSession
+          ? { role, roundKey, answers: answersPayload }
+          : { role, answers: answersPayload };
+
+        const { data } = await api.post(endpoint, payload);
         setResult(data);
         setSubmitted(true);
       } catch (err) {
@@ -90,7 +102,7 @@ export default function AptitudeWorkspace() {
         setSubmitting(false);
       }
     },
-    [submitting, submitted, questions, answers, role]
+    [submitting, submitted, questions, answers, role, isUnlockSession, roundKey]
   );
 
   if (!role || questions.length === 0) return null;
@@ -100,6 +112,75 @@ export default function AptitudeWorkspace() {
 
   // ─── Result Screen ───
   if (submitted && result) {
+    // ── Unlock result screen ──
+    if (isUnlockSession) {
+      const { score, unlocked, passThreshold } = result;
+      return (
+        <div className="min-h-screen">
+          <Navbar />
+          <div className="max-w-2xl mx-auto px-4 py-12 space-y-8">
+            <div
+              className={`glass-card p-8 text-center space-y-6 ring-1 ${
+                unlocked
+                  ? 'ring-emerald-500/30 shadow-emerald-500/10'
+                  : 'ring-red-500/20 shadow-red-500/10'
+              } shadow-lg`}
+            >
+              <div className="text-5xl">{unlocked ? '🔓' : '🔒'}</div>
+              <h1 className="text-2xl font-bold text-stone-900">
+                {unlocked ? 'Aptitude Round Unlocked!' : 'Unlock Attempt Failed'}
+              </h1>
+
+              {/* Score circle */}
+              <div className="flex justify-center">
+                <div className="relative w-28 h-28">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="8" />
+                    <circle
+                      cx="50" cy="50" r="42" fill="none"
+                      stroke={unlocked ? '#10b981' : '#ef4444'}
+                      strokeWidth="8"
+                      strokeLinecap="round"
+                      strokeDasharray={`${(score / 100) * 264} 264`}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl font-bold text-stone-900">{score}</span>
+                    <span className="text-xs text-stone-500">/ 100</span>
+                  </div>
+                </div>
+              </div>
+
+              {unlocked ? (
+                <div className="bg-emerald-500/10 rounded-xl p-4 border border-emerald-500/20">
+                  <p className="text-sm text-emerald-700 font-medium">
+                    🎉 You scored {score}% — the Aptitude round is now unlocked with 3 fresh attempts!
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/20">
+                  <p className="text-sm text-red-400 font-medium">
+                    You scored {score}% — a score of {passThreshold}% or higher is required to unlock this round.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                id="btn-back-to-placement"
+                onClick={() => navigate('/placement')}
+                className="flex-1 py-3 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-200 transition-all"
+              >
+                ← Back to Placement Hub
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Regular aptitude result screen ──
     const { score, passed, correctCount, totalQuestions, attemptsUsed, attemptsRemaining, locked } = result;
 
     return (
@@ -160,7 +241,7 @@ export default function AptitudeWorkspace() {
             {locked && (
               <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/20">
                 <p className="text-sm text-red-400 font-medium">
-                  🔒 Round locked — maximum attempts reached.
+                  🔒 Round locked — maximum attempts reached. Return to the Placement Hub to attempt an unlock interview.
                 </p>
               </div>
             )}

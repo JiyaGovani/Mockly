@@ -8,6 +8,9 @@ import {
   submitTechnical,
   startHr,
   submitHr,
+  startUnlockSession,
+  submitUnlockSession,
+  resetPlacementAttempt,
 } from '../controllers/placementController.js';
 
 const router = Router();
@@ -63,4 +66,28 @@ router.post('/hr/start', startHr);
  */
 router.post('/hr/submit', submitHr);
 
+/**
+ * POST /api/placement/unlock/start
+ * Start a dedicated Unlock Mock Interview for a locked round.
+ * Body: { role, roundKey }
+ */
+router.post('/unlock/start', startUnlockSession);
+
+/**
+ * POST /api/placement/unlock/submit
+ * Submit the Unlock Mock Interview answers.
+ * For aptitude: Body: { role, roundKey, answers: [{ questionId, selectedOption }] }
+ * For technical/hr: Body: { role, roundKey, sessionId }
+ */
+router.post('/unlock/submit', submitUnlockSession);
+
+/**
+ * POST /api/placement/reset
+ * Reset completed or in-progress placement attempt for a role.
+ * Body: { role }
+ */
+router.post('/reset', resetPlacementAttempt);
+
 export default router;
+
+

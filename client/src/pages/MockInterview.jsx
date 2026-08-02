@@ -162,17 +162,32 @@ export default function MockInterview() {
       }));
       await api.put(`/sessions/${session._id}/save`, { answers: payload });
 
-      // Submit for evaluation depending on whether it is a placement round simulation
-      if (state?.placementRound && state?.placementRole) {
+      // Submit for evaluation depending on context
+      if (state?.isUnlock && state?.placementRole && state?.placementRound) {
+        // Unlock session submit
+        const { data } = await api.post('/placement/unlock/submit', {
+          role: state.placementRole,
+          roundKey: state.placementRound,
+          sessionId: session._id,
+        });
+        // Navigate to scorecard then pass unlock result in state
+        navigate(`/mock/scorecard/${session._id}`, {
+          state: {
+            ...state,
+            unlockResult: data,
+          },
+        });
+      } else if (state?.placementRound && state?.placementRole) {
         if (state.placementRound === 'technical') {
           await api.post('/placement/technical/submit', { role: state.placementRole });
         } else if (state.placementRound === 'hr') {
           await api.post('/placement/hr/submit', { role: state.placementRole });
         }
+        navigate(`/mock/scorecard/${session._id}`, { state });
       } else {
         await api.post(`/sessions/${session._id}/submit`);
+        navigate(`/mock/scorecard/${session._id}`, { state });
       }
-      navigate(`/mock/scorecard/${session._id}`, { state });
     } catch (err) {
       console.error('Submit failed:', err);
       setSubmitting(false);
