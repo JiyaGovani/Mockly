@@ -447,19 +447,32 @@ router.post('/:id/submit', protect, async (req, res) => {
           meta.answerRef.suggestions = evalResult.suggestions || [];
 
           // Score Blender
-          const finalScore = blendEvaluationScores({
-            questionType: meta.question.type,
-            keywordScore: meta.keywordScore,
-            embeddingScore: meta.embeddingScore,
-            llmScore: evalResult.score,
+          const blended = blendEvaluationScores({
+            question: meta.question,
+            keywordResult: {
+              score: meta.keywordScore,
+              matchedKeywords: meta.answerRef.matchedKeywords || [],
+              missingKeywords: meta.answerRef.missingKeywords || [],
+            },
+            embeddingResult: {
+              score: meta.embeddingScore,
+              similarity: meta.semanticSimilarity || 0,
+            },
+            llmResult: {
+              score: evalResult.score,
+              rubric: evalResult.rubric,
+              strengths: evalResult.strengths,
+              weaknesses: evalResult.weaknesses,
+              missingPoints: evalResult.missingPoints,
+              suggestions: evalResult.suggestions,
+            },
+            embeddingLatency: meta.embedLatency,
+            llmLatency: llmLatency,
+            totalLatency: meta.embedLatency + llmLatency,
           });
 
-          meta.answerRef.overallScore = finalScore;
-          meta.answerRef.latency = {
-            embedding: meta.embedLatency,
-            llm: llmLatency,
-            total: meta.embedLatency + llmLatency,
-          };
+          meta.answerRef.overallScore = blended.overallScore;
+          meta.answerRef.latency = blended.latency;
         }
       } catch (batchErr) {
         console.error('Single batch evaluation failed:', batchErr);

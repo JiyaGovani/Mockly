@@ -54,11 +54,10 @@ If the student's answer is empty, completely incorrect, off-topic, or contains n
 
   let lastError = null;
 
-  // Fallback Loop over available API Keys and Priority Models
-  for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
-    const client = getAIClient(keyIdx);
-
-    for (const modelName of FALLBACK_MODELS) {
+  // Priority Loop: Primary Best Model tried across ALL Keys first before falling back
+  for (const modelName of FALLBACK_MODELS) {
+    for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
+      const client = getAIClient(keyIdx);
       try {
         const model = client.getGenerativeModel({
           model: modelName,
@@ -135,29 +134,8 @@ If the student's answer is empty, completely incorrect, off-topic, or contains n
         };
       } catch (err) {
         lastError = err;
-        const errMsg = (err.message || '').toLowerCase();
-
-        // Detect 429 Rate Limit / Quota Exceeded / Service Overload
-        const isQuotaError = 
-          errMsg.includes('429') || 
-          errMsg.includes('quota') || 
-          errMsg.includes('resource_exhausted') ||
-          errMsg.includes('rate limit') ||
-          errMsg.includes('503') ||
-          errMsg.includes('overloaded');
-
-        if (isQuotaError) {
-          console.warn(`⚠️ Model '${modelName}' hit rate limit/quota (Key #${keyIdx + 1}). Auto-switching to fallback model...`);
-          continue; // Try next fallback model
-        }
-
-        // If model not found (404), try next model in chain
-        if (errMsg.includes('404') || errMsg.includes('not found')) {
-          console.warn(`⚠️ Model '${modelName}' not found. Trying next fallback model...`);
-          continue;
-        }
-
-        throw err;
+        console.warn(`🔄 AUTO-SWITCH: Key #${keyIdx + 1} (${GEMINI_API_KEYS[keyIdx]?.slice(0, 8)}...) / Model '${modelName}' failed with error: [${err.message}]. Trying next model/key...`);
+        continue;
       }
     }
   }
@@ -212,11 +190,13 @@ ${formattedItems}
 
   let lastError = null;
 
-  for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
-    const client = getAIClient(keyIdx);
-
-    for (const modelName of FALLBACK_MODELS) {
+  // Priority Loop: Primary Best Model tried across ALL Keys first before falling back
+  for (const modelName of FALLBACK_MODELS) {
+    for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
+      const client = getAIClient(keyIdx);
       try {
+        console.log(`🤖 Attempting Batch AI Evaluation with Key #${keyIdx + 1} (${GEMINI_API_KEYS[keyIdx].slice(0, 8)}...) using model '${modelName}'...`);
+
         const model = client.getGenerativeModel({
           model: modelName,
           generationConfig: {
@@ -278,6 +258,8 @@ ${formattedItems}
         const parsed = JSON.parse(responseText);
         const evalList = Array.isArray(parsed.evaluations) ? parsed.evaluations : [];
 
+        console.log(`✅ Batch AI Evaluation SUCCEEDED using Key #${keyIdx + 1} and model '${modelName}'! Evaluated ${evalList.length} items.`);
+
         const resultMap = new Map();
         for (const ev of evalList) {
           const rubricObj = ev.rubric || {};
@@ -298,26 +280,8 @@ ${formattedItems}
         return resultMap;
       } catch (err) {
         lastError = err;
-        const errMsg = (err.message || '').toLowerCase();
-        const isQuotaError = 
-          errMsg.includes('429') || 
-          errMsg.includes('quota') || 
-          errMsg.includes('resource_exhausted') ||
-          errMsg.includes('rate limit') ||
-          errMsg.includes('503') ||
-          errMsg.includes('overloaded');
-
-        if (isQuotaError) {
-          console.warn(`⚠️ Batch Model '${modelName}' hit rate limit/quota (Key #${keyIdx + 1}). Auto-switching...`);
-          continue;
-        }
-
-        if (errMsg.includes('404') || errMsg.includes('not found')) {
-          console.warn(`⚠️ Batch Model '${modelName}' not found. Trying next fallback model...`);
-          continue;
-        }
-
-        throw err;
+        console.warn(`🔄 AUTO-SWITCH: Key #${keyIdx + 1} (${GEMINI_API_KEYS[keyIdx]?.slice(0, 8)}...) / Model '${modelName}' failed with error: [${err.message}]. Trying next model/key...`);
+        continue;
       }
     }
   }
