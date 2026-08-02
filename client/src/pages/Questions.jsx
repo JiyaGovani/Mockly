@@ -147,8 +147,6 @@ export default function Questions() {
   // Modal
   const [selectedQuestion, setSelectedQuestion] = useState(null);
 
-<<<<<<< HEAD
-=======
   // Mock interview state
   const [showMockModal, setShowMockModal] = useState(false);
   const [mockRole, setMockRole] = useState('');
@@ -184,7 +182,6 @@ export default function Questions() {
     }
   };
 
->>>>>>> 4edffb255a90bf7d4f3060cb321980855f750d39
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => setSearchDebounced(search), 300);
@@ -250,11 +247,10 @@ export default function Questions() {
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
           <button
             onClick={() => setActiveRole('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-              activeRole === 'all'
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${activeRole === 'all'
                 ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
                 : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-800 border border-stone-300'
-            }`}
+              }`}
           >
             All Roles
           </button>
@@ -262,11 +258,10 @@ export default function Questions() {
             <button
               key={role._id}
               onClick={() => setActiveRole(role.name)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-                activeRole === role.name
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${activeRole === role.name
                   ? 'bg-gradient-to-r from-amber-900 to-amber-700 text-white shadow-lg shadow-amber-900/25'
                   : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-800 border border-stone-300'
-              }`}
+                }`}
             >
               {role.displayName}
             </button>
@@ -417,8 +412,6 @@ export default function Questions() {
         question={selectedQuestion}
         onClose={() => setSelectedQuestion(null)}
       />
-<<<<<<< HEAD
-=======
 
       {/* Mock Interview Modal */}
       {showMockModal && (
@@ -519,7 +512,7 @@ export default function Questions() {
           </div>
         </div>
       )}
->>>>>>> 4edffb255a90bf7d4f3060cb321980855f750d39
+
     </div>
   );
 }
