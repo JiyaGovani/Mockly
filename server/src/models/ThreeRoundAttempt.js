@@ -75,16 +75,30 @@ const threeRoundAttemptSchema = new mongoose.Schema(
         locked: { type: Boolean, default: false },
       },
     },
+    attemptNumber: {
+      type: Number,
+      default: 1,
+    },
+    isLatest: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
   },
   { timestamps: true }
 );
 
-// A user can only have one active placement attempt per role
-threeRoundAttemptSchema.index({ user: 1, role: 1 }, { unique: true });
+// Non-unique index for fast lookup of user placement attempts per role
+threeRoundAttemptSchema.index({ user: 1, role: 1, isLatest: 1 });
 
 const ThreeRoundAttempt = mongoose.model(
   'ThreeRoundAttempt',
   threeRoundAttemptSchema
 );
+
+// Safely drop pre-existing unique index from MongoDB collection if present
+ThreeRoundAttempt.collection.dropIndex('user_1_role_1').catch(() => {
+  // Ignore error if index does not exist in MongoDB
+});
 
 export default ThreeRoundAttempt;

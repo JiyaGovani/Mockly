@@ -22,15 +22,42 @@ const PASS_SCORES = {
  * Returns the existing in-progress attempt, or creates a fresh one.
  */
 async function getOrCreateAttempt(userId, role) {
+  const roleUpper = role.toUpperCase();
+
   let attempt = await ThreeRoundAttempt.findOne({
     user: userId,
-    role: role.toUpperCase(),
+    role: roleUpper,
+    isLatest: true,
   });
 
+  // If the latest attempt is completed (passed or failed), archive it and create a fresh attempt document
+  if (attempt && (attempt.status === 'passed' || attempt.status === 'failed')) {
+    await ThreeRoundAttempt.updateOne(
+      { _id: attempt._id },
+      { $set: { isLatest: false } }
+    );
+    attempt = null;
+  }
+
   if (!attempt) {
+    // Count total existing attempt documents for this user and role
+    const count = await ThreeRoundAttempt.countDocuments({
+      user: userId,
+      role: roleUpper,
+    });
+
+    // Mark any remaining attempts for this user & role as isLatest: false
+    await ThreeRoundAttempt.updateMany(
+      { user: userId, role: roleUpper },
+      { $set: { isLatest: false } }
+    );
+
     attempt = await ThreeRoundAttempt.create({
       user: userId,
-      role: role.toUpperCase(),
+      role: roleUpper,
+      attemptNumber: count + 1,
+      isLatest: true,
+      status: 'in_progress',
     });
   }
 
@@ -132,12 +159,17 @@ export async function getStatus(req, res) {
       return res.status(400).json({ message: 'Role query parameter is required' });
     }
 
-    const attempt = await ThreeRoundAttempt.findOne({
+    const attempts = await ThreeRoundAttempt.find({
       user: req.user._id,
       role: role.toUpperCase(),
-    });
+    }).sort({ attemptNumber: -1 });
 
-    return res.status(200).json({ attempt: attempt || null });
+    const latestAttempt = attempts.find((a) => a.isLatest) || attempts[0] || null;
+
+    return res.status(200).json({
+      attempt: latestAttempt,
+      history: attempts,
+    });
   } catch (err) {
     console.error('Error fetching placement status:', err);
     return res.status(500).json({ message: 'Server error fetching placement status' });
@@ -216,6 +248,7 @@ export async function submitAptitude(req, res) {
     const attempt = await ThreeRoundAttempt.findOne({
       user: req.user._id,
       role: role.toUpperCase(),
+      isLatest: true,
     }).populate('rounds.aptitude.questions');
 
     if (!attempt) {
@@ -287,6 +320,7 @@ export async function startTechnical(req, res) {
     const attempt = await ThreeRoundAttempt.findOne({
       user: req.user._id,
       role: role.toUpperCase(),
+      isLatest: true,
     });
 
     if (!attempt) {
@@ -358,6 +392,7 @@ export async function submitTechnical(req, res) {
     const attempt = await ThreeRoundAttempt.findOne({
       user: req.user._id,
       role: role.toUpperCase(),
+      isLatest: true,
     });
 
     if (!attempt || !attempt.rounds.technical.sessionId) {
@@ -467,6 +502,7 @@ export async function startHr(req, res) {
     const attempt = await ThreeRoundAttempt.findOne({
       user: req.user._id,
       role: role.toUpperCase(),
+      isLatest: true,
     });
 
     if (!attempt) {
@@ -536,6 +572,7 @@ export async function submitHr(req, res) {
     const attempt = await ThreeRoundAttempt.findOne({
       user: req.user._id,
       role: role.toUpperCase(),
+      isLatest: true,
     });
 
     if (!attempt || !attempt.rounds.hr.sessionId) {
@@ -668,6 +705,7 @@ export async function startUnlockSession(req, res) {
     const attempt = await ThreeRoundAttempt.findOne({
       user: req.user._id,
       role: role.toUpperCase(),
+      isLatest: true,
     });
 
     if (!attempt) {
@@ -763,6 +801,7 @@ export async function submitUnlockSession(req, res) {
     const attempt = await ThreeRoundAttempt.findOne({
       user: req.user._id,
       role: role.toUpperCase(),
+      isLatest: true,
     });
 
     if (!attempt) {
@@ -914,47 +953,35 @@ export async function resetPlacementAttempt(req, res) {
       return res.status(400).json({ message: 'Role is required' });
     }
 
-    const attempt = await ThreeRoundAttempt.findOne({
+    // Find all attempts for this user and role
+    const existingAttempts = await ThreeRoundAttempt.find({
       user: req.user._id,
       role: role.toUpperCase(),
-    });
+    }).sort({ attemptNumber: -1 });
 
-    if (!attempt) {
+    if (existingAttempts.length === 0) {
       return res.status(404).json({ message: 'No placement attempt found for this role.' });
     }
 
-    attempt.status = 'in_progress';
-    attempt.rounds.aptitude = {
-      attemptsCount: 0,
-      passed: false,
-      score: null,
-      completedAt: null,
-      answers: [],
-      questions: [],
-      locked: false,
-    };
-    attempt.rounds.technical = {
-      attemptsCount: 0,
-      passed: false,
-      score: null,
-      completedAt: null,
-      sessionId: null,
-      locked: false,
-    };
-    attempt.rounds.hr = {
-      attemptsCount: 0,
-      passed: false,
-      score: null,
-      completedAt: null,
-      sessionId: null,
-      locked: false,
-    };
+    // Mark all existing attempts for this role as isLatest: false to preserve past history
+    await ThreeRoundAttempt.updateMany(
+      { user: req.user._id, role: role.toUpperCase() },
+      { $set: { isLatest: false } }
+    );
 
-    await attempt.save();
+    // Create a brand new Placement Attempt document for fresh attempt
+    const nextAttemptNumber = existingAttempts[0].attemptNumber + 1;
+    const newAttempt = await ThreeRoundAttempt.create({
+      user: req.user._id,
+      role: role.toUpperCase(),
+      attemptNumber: nextAttemptNumber,
+      isLatest: true,
+      status: 'in_progress',
+    });
 
     return res.status(200).json({
-      message: 'Placement attempt reset successfully. You can now re-attempt all rounds.',
-      attempt,
+      message: `Placement attempt reset successfully! Created Attempt #${nextAttemptNumber}. Past history preserved.`,
+      attempt: newAttempt,
     });
   } catch (err) {
     console.error('Error resetting placement attempt:', err);
