@@ -283,6 +283,14 @@ export async function submitAptitude(req, res) {
     attempt.rounds.aptitude.answers = gradedAnswers;
     attempt.rounds.aptitude.completedAt = new Date();
 
+    // Push per-trial audit record
+    attempt.rounds.aptitude.trials.push({
+      trialNumber: attempt.rounds.aptitude.attemptsCount,
+      score,
+      passed,
+      completedAt: new Date(),
+    });
+
     // Lock if max attempts reached and still not passed
     if (!passed && attempt.rounds.aptitude.attemptsCount >= MAX_ATTEMPTS) {
       attempt.rounds.aptitude.locked = true;
@@ -464,6 +472,15 @@ export async function submitTechnical(req, res) {
     attempt.rounds.technical.score = score;
     attempt.rounds.technical.passed = passed;
     attempt.rounds.technical.completedAt = new Date();
+
+    // Push per-trial audit record
+    attempt.rounds.technical.trials.push({
+      trialNumber: attempt.rounds.technical.attemptsCount,
+      score,
+      passed,
+      sessionId: session._id,
+      completedAt: new Date(),
+    });
 
     if (!passed && attempt.rounds.technical.attemptsCount >= MAX_ATTEMPTS) {
       attempt.rounds.technical.locked = true;
@@ -650,6 +667,15 @@ export async function submitHr(req, res) {
     attempt.rounds.hr.score = score;
     attempt.rounds.hr.passed = passed;
     attempt.rounds.hr.completedAt = new Date();
+
+    // Push per-trial audit record
+    attempt.rounds.hr.trials.push({
+      trialNumber: attempt.rounds.hr.attemptsCount,
+      score,
+      passed,
+      sessionId: session._id,
+      completedAt: new Date(),
+    });
 
     if (!passed && attempt.rounds.hr.attemptsCount >= MAX_ATTEMPTS) {
       attempt.rounds.hr.locked = true;
