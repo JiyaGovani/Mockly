@@ -140,7 +140,7 @@ export default function Dashboard() {
               {/* Card 1 */}
               <div className="glass-card p-6 flex items-center justify-between hover:bg-white/10 transition-all duration-300">
                 <div>
-                  <span className="text-stone-500 text-xs font-semibold uppercase tracking-wider">Total Practiced</span>
+                  <span className="text-stone-500 text-xs font-semibold uppercase tracking-wider">Questions Explored</span>
                   <h3 className="text-3xl font-extrabold text-stone-900 mt-1">{stats?.totalQuestionsPracticed}</h3>
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-800">
@@ -160,7 +160,7 @@ export default function Dashboard() {
               {/* Card 3 */}
               <div className="glass-card p-6 flex items-center justify-between hover:bg-white/10 transition-all duration-300">
                 <div>
-                  <span className="text-stone-500 text-xs font-semibold uppercase tracking-wider">Mock Sessions</span>
+                  <span className="text-stone-500 text-xs font-semibold uppercase tracking-wider">Mock Sessions Attempted</span>
                   <h3 className="text-3xl font-extrabold text-stone-900 mt-1">{stats?.activeSessions}</h3>
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
