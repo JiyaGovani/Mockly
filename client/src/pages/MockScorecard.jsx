@@ -213,9 +213,9 @@ export default function MockScorecard() {
     );
   }
 
-  const elapsed = Math.floor(
-    (new Date(session.completedAt).getTime() - new Date(session.startedAt).getTime()) / 60000
-  );
+  const startTime = session.startedAt ? new Date(session.startedAt).getTime() : (session.createdAt ? new Date(session.createdAt).getTime() - 300000 : Date.now() - 300000);
+  const endTime = session.completedAt ? new Date(session.completedAt).getTime() : Date.now();
+  const elapsed = Math.max(1, Math.floor((endTime - startTime) / 60000));
 
   return (
     <div className="min-h-screen relative">

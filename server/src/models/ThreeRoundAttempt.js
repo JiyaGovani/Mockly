@@ -25,6 +25,25 @@ const aptitudeAnswerSchema = new mongoose.Schema(
   { _id: false }
 );
 
+/**
+ * Per-trial audit log — records every individual submission attempt
+ * within a round (up to MAX_ATTEMPTS = 3).
+ */
+const trialSchema = new mongoose.Schema(
+  {
+    trialNumber: { type: Number, required: true }, // 1, 2, or 3
+    score: { type: Number, required: true },
+    passed: { type: Boolean, required: true },
+    sessionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'InterviewSession',
+      default: null,
+    },
+    completedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
 const threeRoundAttemptSchema = new mongoose.Schema(
   {
     user: {
@@ -55,6 +74,7 @@ const threeRoundAttemptSchema = new mongoose.Schema(
         answers: { type: [aptitudeAnswerSchema], default: [] },
         questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
         locked: { type: Boolean, default: false },
+        trials: { type: [trialSchema], default: [] },
       },
       technical: {
         ...roundResultSchema.obj,
@@ -64,6 +84,7 @@ const threeRoundAttemptSchema = new mongoose.Schema(
           default: null,
         },
         locked: { type: Boolean, default: false },
+        trials: { type: [trialSchema], default: [] },
       },
       hr: {
         ...roundResultSchema.obj,
@@ -73,6 +94,7 @@ const threeRoundAttemptSchema = new mongoose.Schema(
           default: null,
         },
         locked: { type: Boolean, default: false },
+        trials: { type: [trialSchema], default: [] },
       },
     },
     attemptNumber: {

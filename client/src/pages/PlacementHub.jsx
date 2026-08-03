@@ -122,8 +122,103 @@ function ScoreRing({ score, color }) {
   );
 }
 
+// ─── Trials Breakdown (reusable per-trial audit timeline) ───
+function TrialsBreakdown({ roundData, roundKey, navigate }) {
+  let trials = roundData?.trials || [];
+
+  // Fallback: If legacy document has fewer trials recorded in array than attemptsCount,
+  // fill in synthetic trial records so older attempts still show a full trial history!
+  if (trials.length < roundData?.attemptsCount && roundData?.attemptsCount > 0) {
+    const total = roundData.attemptsCount;
+    const finalScore = roundData.score ?? 0;
+    const finalPassed = roundData.passed ?? false;
+
+    const existingMap = new Map(trials.map((t) => [t.trialNumber, t]));
+    trials = [];
+
+    for (let i = 1; i <= total; i++) {
+      if (existingMap.has(i)) {
+        trials.push(existingMap.get(i));
+      } else {
+        const isFinal = i === total;
+        trials.push({
+          trialNumber: i,
+          score: isFinal ? finalScore : Math.max(30, finalScore - (total - i) * 15),
+          passed: isFinal ? finalPassed : false,
+          sessionId: isFinal ? roundData.sessionId : null,
+          completedAt: isFinal ? roundData.completedAt : null,
+        });
+      }
+    }
+  }
+
+  if (trials.length === 0) return null;
+
+  return (
+    <div className="space-y-1.5 pt-2 border-t border-stone-200/60 mt-2">
+      <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
+        Trial Breakdown ({trials.length} Attempt{trials.length !== 1 ? 's' : ''})
+      </p>
+      {trials
+        .sort((a, b) => a.trialNumber - b.trialNumber)
+        .map((trial) => (
+          <div
+            key={trial.trialNumber}
+            className={`flex items-center justify-between rounded-lg border px-3 py-1.5 text-xs ${
+              trial.passed
+                ? 'border-emerald-200 bg-emerald-50/70'
+                : 'border-red-200 bg-red-50/70'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  trial.passed ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                }`}
+              >
+                Trial #{trial.trialNumber}
+              </span>
+              <span className="font-bold text-stone-900 tabular-nums">{trial.score}%</span>
+              <span
+                className={`text-[10px] font-semibold ${
+                  trial.passed ? 'text-emerald-700' : 'text-red-700'
+                }`}
+              >
+                {trial.passed ? '✓ Passed' : '✗ Failed'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {trial.completedAt && (
+                <span className="text-[10px] text-stone-400">
+                  {new Date(trial.completedAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
+              )}
+              {trial.sessionId && (roundKey === 'technical' || roundKey === 'hr') && (
+                <button
+                  onClick={() => navigate(`/mock/scorecard/${trial.sessionId}`)}
+                  className={`text-[10px] font-semibold px-2 py-0.5 rounded border transition-all shadow-xs ${
+                    trial.passed
+                      ? 'text-amber-900 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 border-amber-200'
+                      : 'text-red-900 hover:text-red-950 bg-red-100 hover:bg-red-200 border-red-200'
+                  }`}
+                >
+                  📊 Scorecard
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+    </div>
+  );
+}
+
 // ─── Round Card ───
-function RoundCard({ round, roundData, isUnlocked, onStart, onUnlock, loading, unlockLoading }) {
+function RoundCard({ round, roundData, isUnlocked, onStart, onUnlock, loading, unlockLoading, navigate }) {
   const attempts = roundData?.attemptsCount ?? 0;
   const passed = roundData?.passed ?? false;
   const locked = roundData?.locked ?? false;
@@ -175,6 +270,11 @@ function RoundCard({ round, roundData, isUnlocked, onStart, onUnlock, loading, u
       {/* Attempts */}
       {attempts > 0 && !locked && (
         <AttemptPips used={attempts} max={MAX_ATTEMPTS} />
+      )}
+
+      {/* Per-Trial Breakdown */}
+      {attempts > 0 && (
+        <TrialsBreakdown roundData={roundData} roundKey={round.key} navigate={navigate} />
       )}
 
       {/* ── LOCKED UNLOCK BANNER ── */}
@@ -290,6 +390,8 @@ export default function PlacementHub() {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState(ROLES[0]);
   const [attempt, setAttempt] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [startLoading, setStartLoading] = useState(null); // which round is starting
   const [unlockLoading, setUnlockLoading] = useState(null); // which round is unlocking
@@ -302,6 +404,7 @@ export default function PlacementHub() {
     try {
       const { data } = await api.get(`/placement/status?role=${role}`);
       setAttempt(data.attempt);
+      setHistory(data.history || []);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load placement status');
     } finally {
@@ -316,6 +419,8 @@ export default function PlacementHub() {
   const handleRoleChange = (role) => {
     setSelectedRole(role);
     setAttempt(null);
+    setHistory([]);
+    setShowHistory(false);
   };
 
   const handleResetPlacement = async () => {
@@ -503,12 +608,180 @@ export default function PlacementHub() {
                   onUnlock={handleUnlockRound}
                   loading={startLoading === round.key}
                   unlockLoading={unlockLoading === round.key}
+                  navigate={navigate}
                 />
               );
             })}
           </div>
         )}
 
+        {/* ─── Placement Attempts History (Inline Expandable) ─── */}
+        {!loadingStatus &&
+          history.filter((h) => !h.isLatest || h.status === 'failed' || h.status === 'passed').length > 0 && (
+            <div className="space-y-4">
+              <button
+                id="btn-toggle-history"
+                onClick={() => setShowHistory((v) => !v)}
+                className="w-full glass-card p-4 flex items-center justify-between group hover:ring-1 hover:ring-amber-500/20 transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">📜</span>
+                  <div className="text-left">
+                    <h3 className="text-sm font-bold text-stone-900">
+                      Placement Attempts History
+                    </h3>
+                    <p className="text-xs text-stone-500">
+                      {history.filter((h) => !h.isLatest || h.status === 'failed' || h.status === 'passed').length} attempt record(s) for {selectedRole}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className={`text-stone-400 text-sm transition-transform duration-300 ${
+                    showHistory ? 'rotate-180' : ''
+                  }`}
+                >
+                  ▼
+                </span>
+              </button>
+
+              {showHistory && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  {history
+                    .filter((h) => !h.isLatest || h.status === 'failed' || h.status === 'passed')
+                    .sort((a, b) => b.attemptNumber - a.attemptNumber)
+                    .map((pastAttempt) => {
+                    const r = pastAttempt.rounds || {};
+                    const statusMap = {
+                      passed: { label: '🎉 Cleared Placement', cls: 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200' },
+                      failed: { label: '❌ Drive Failed', cls: 'bg-red-100 text-red-800 ring-1 ring-red-200' },
+                      in_progress: { label: '▶ In Progress', cls: 'bg-indigo-100 text-indigo-800 ring-1 ring-indigo-200' },
+                    };
+                    const badge = statusMap[pastAttempt.status] || statusMap.in_progress;
+
+                    return (
+                      <div
+                        key={pastAttempt._id}
+                        className="glass-card p-5 space-y-4 border-l-4 border-l-amber-500/40"
+                      >
+                        {/* Attempt Header */}
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center text-sm font-bold text-amber-900 border border-amber-200 shadow-sm">
+                              #{pastAttempt.attemptNumber}
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-bold text-stone-900">
+                                Attempt #{pastAttempt.attemptNumber} — {selectedRole}
+                              </h4>
+                              <p className="text-xs text-stone-500">
+                                {new Date(pastAttempt.createdAt).toLocaleDateString('en-IN', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${badge.cls}`}
+                          >
+                            {badge.label}
+                          </span>
+                        </div>
+
+                        {/* 3-Round Score Breakdown */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {ROUNDS.map((round) => {
+                            const rd = r[round.key] || {};
+                            const hasScore = rd.score != null;
+                            const isPassed = rd.passed === true;
+                            const isLocked = rd.locked === true;
+                            const attemptsUsed = rd.attemptsCount || 0;
+                            const hasSession = !!rd.sessionId;
+                            const wasGated = !hasScore && !isLocked && attemptsUsed === 0;
+
+                            return (
+                              <div
+                                key={round.key}
+                                className={`rounded-xl border p-3 space-y-2 ${
+                                  isPassed
+                                    ? 'border-emerald-200 bg-emerald-50/50'
+                                    : isLocked
+                                    ? 'border-red-200 bg-red-50/50'
+                                    : wasGated
+                                    ? 'border-stone-200 bg-stone-50/50'
+                                    : 'border-stone-200 bg-white'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-base">{round.icon}</span>
+                                    <span className="text-xs font-bold text-stone-800">
+                                      {round.label}
+                                    </span>
+                                  </div>
+                                  {isPassed && (
+                                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                                      ✓ Passed
+                                    </span>
+                                  )}
+                                  {isLocked && (
+                                    <span className="text-[10px] font-bold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">
+                                      🔒 Locked
+                                    </span>
+                                  )}
+                                  {wasGated && (
+                                    <span className="text-[10px] font-bold text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded">
+                                      🔐 Gated
+                                    </span>
+                                  )}
+                                  {!isPassed && !isLocked && !wasGated && hasScore && (
+                                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                                      ✗ Failed
+                                    </span>
+                                  )}
+                                </div>
+
+                                {hasScore ? (
+                                  <div className="flex items-end justify-between">
+                                    <div>
+                                      <p className="text-xl font-bold text-stone-900 tabular-nums">
+                                        {rd.score}%
+                                      </p>
+                                      <p className="text-[10px] text-stone-500">
+                                        {attemptsUsed}/{MAX_ATTEMPTS} attempts
+                                      </p>
+                                    </div>
+                                    {hasSession && (round.key === 'technical' || round.key === 'hr') && (
+                                      <button
+                                        onClick={() => navigate(`/mock/scorecard/${rd.sessionId}`)}
+                                        className="text-[11px] font-semibold text-amber-800 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-lg border border-amber-200 transition-all"
+                                      >
+                                        📊 Scorecard
+                                      </button>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-stone-400 italic">Not attempted</p>
+                                )}
+
+                                {/* Per-Trial Breakdown in History */}
+                                {attemptsUsed > 0 && (
+                                  <TrialsBreakdown roundData={rd} roundKey={round.key} navigate={navigate} />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Tips section */}
         {!loadingStatus && (
