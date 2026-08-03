@@ -99,16 +99,18 @@ function QuestionAccordion({ answer, question, index }) {
 
       {/* Expanded content */}
       <div
-        className={`border-t border-stone-200 transition-all duration-300 ease-in-out overflow-hidden ${
-          expanded ? 'max-h-[1200px] opacity-100 p-5 space-y-5' : 'max-h-0 opacity-0 p-0 pointer-events-none'
+        className={`border-t border-stone-200 transition-all duration-300 ease-in-out ${
+          expanded ? 'max-h-[3000px] opacity-100 p-5 space-y-5 overflow-y-auto' : 'max-h-0 opacity-0 p-0 overflow-hidden pointer-events-none'
         }`}
       >
         {/* User's answer */}
         <div>
           <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">Your Answer</h4>
-          <p className="text-sm text-stone-700 bg-stone-100 border border-stone-200 rounded-lg p-3 leading-relaxed">
-            {answer.userAnswer || <span className="text-stone-550 italic">No answer provided</span>}
-          </p>
+          <div className="bg-stone-100 border border-stone-200 rounded-lg p-3 max-h-60 overflow-y-auto">
+            <p className="text-sm text-stone-700 leading-relaxed whitespace-pre-wrap">
+              {answer.userAnswer || <span className="text-stone-550 italic">No answer provided</span>}
+            </p>
+          </div>
         </div>
 
         {/* Score breakdown */}
@@ -132,7 +134,7 @@ function QuestionAccordion({ answer, question, index }) {
         {answer.strengths && answer.strengths.length > 0 && (
           <div>
             <h4 className="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-2">✓ Strengths</h4>
-            <ul className="space-y-1">
+            <ul className="space-y-1 max-h-60 overflow-y-auto pr-1">
               {answer.strengths.map((s, i) => (
                 <li key={i} className="text-sm text-stone-700 flex items-start gap-2">
                   <span className="text-emerald-500 mt-1 flex-shrink-0">•</span> {s}
@@ -144,8 +146,8 @@ function QuestionAccordion({ answer, question, index }) {
 
         {answer.weaknesses && answer.weaknesses.length > 0 && (
           <div>
-            <h4 className="text-xs font-semibold text-red-750 uppercase tracking-wider mb-2">✗ Weaknesses</h4>
-            <ul className="space-y-1">
+            <h4 className="text-xs font-semibold text-red-750 uppercase tracking-wider mb-2">✕ Weaknesses</h4>
+            <ul className="space-y-1 max-h-60 overflow-y-auto pr-1">
               {answer.weaknesses.map((w, i) => (
                 <li key={i} className="text-sm text-stone-700 flex items-start gap-2">
                   <span className="text-red-500 mt-1 flex-shrink-0">•</span> {w}
@@ -158,7 +160,7 @@ function QuestionAccordion({ answer, question, index }) {
         {answer.suggestions && answer.suggestions.length > 0 && (
           <div>
             <h4 className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-2">💡 Suggestions</h4>
-            <ul className="space-y-1">
+            <ul className="space-y-1 max-h-60 overflow-y-auto pr-1">
               {answer.suggestions.map((s, i) => (
                 <li key={i} className="text-sm text-stone-700 flex items-start gap-2">
                   <span className="text-amber-500 mt-1 flex-shrink-0">•</span> {s}

@@ -11,7 +11,7 @@ export default function FeedbackCard({ title, items, icon, colorClass }) {
       <h4 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${colorClass}`}>
         <span>{icon}</span> {title}
       </h4>
-      <ul className="space-y-2">
+      <ul className="space-y-2 max-h-60 overflow-y-auto pr-1">
         {items.map((item, i) => (
           <li key={i} className="text-sm text-stone-700 flex items-start gap-2">
             <span className="text-stone-400 mt-0.5 shrink-0">•</span>
