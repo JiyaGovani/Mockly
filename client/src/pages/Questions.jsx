@@ -206,7 +206,7 @@ export default function Questions() {
       if (activeDifficulty !== 'all') params.difficulty = activeDifficulty;
       if (searchDebounced) params.search = searchDebounced;
       params.page = pagination.page;
-      params.limit = 20;
+      params.limit = 15;
 
       const { data } = await api.get('/questions', { params });
       setQuestions(data.questions);
@@ -387,21 +387,39 @@ export default function Questions() {
         {!loading && pagination.pages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-8">
             <button
+              onClick={() => setPagination((p) => ({ ...p, page: 1 }))}
+              disabled={pagination.page <= 1}
+              title="First Page"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm font-semibold border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              {"<<"}
+            </button>
+            <button
               onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}
               disabled={pagination.page <= 1}
-              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              title="Previous Page"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm font-semibold border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              ← Prev
+              {"<"}
             </button>
-            <span className="text-sm text-stone-500">
+            <span className="text-sm text-stone-500 px-2 font-medium">
               Page {pagination.page} of {pagination.pages}
             </span>
             <button
               onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
               disabled={pagination.page >= pagination.pages}
-              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              title="Next Page"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm font-semibold border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              Next →
+              {">"}
+            </button>
+            <button
+              onClick={() => setPagination((p) => ({ ...p, page: pagination.pages }))}
+              disabled={pagination.page >= pagination.pages}
+              title="Last Page"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-600 text-sm font-semibold border border-stone-200 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              {">>"}
             </button>
           </div>
         )}
