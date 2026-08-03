@@ -122,7 +122,7 @@ function ScoreRing({ score, color }) {
   );
 }
 
-// ─── Trials Breakdown (reusable per-trial audit timeline) ───
+// ─── Attempt Breakdown (reusable per-attempt audit timeline) ───
 function TrialsBreakdown({ roundData, roundKey, navigate }) {
   let trials = roundData?.trials || [];
 
@@ -155,64 +155,112 @@ function TrialsBreakdown({ roundData, roundKey, navigate }) {
   if (trials.length === 0) return null;
 
   return (
-    <div className="space-y-1.5 pt-2 border-t border-stone-200/60 mt-2">
-      <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-        Trial Breakdown ({trials.length} Attempt{trials.length !== 1 ? 's' : ''})
-      </p>
-      {trials
-        .sort((a, b) => a.trialNumber - b.trialNumber)
-        .map((trial) => (
-          <div
-            key={trial.trialNumber}
-            className={`flex items-center justify-between rounded-lg border px-3 py-1.5 text-xs ${
-              trial.passed
-                ? 'border-emerald-200 bg-emerald-50/70'
-                : 'border-red-200 bg-red-50/70'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <span
-                className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                  trial.passed ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+    <div className="space-y-2.5 pt-3 border-t border-stone-200/80 mt-3">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-bold text-stone-600 uppercase tracking-wider flex items-center gap-1.5">
+          <span className="text-amber-800 text-xs">⚡</span>
+          <span>Attempt Breakdown</span>
+        </p>
+        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
+          {trials.length} {trials.length === 1 ? 'Attempt' : 'Attempts'}
+        </span>
+      </div>
+
+      {/* Attempt Items */}
+      <div className="space-y-2">
+        {trials
+          .sort((a, b) => a.trialNumber - b.trialNumber)
+          .map((trial) => {
+            const scorePct = Math.max(0, Math.min(100, trial.score ?? 0));
+            const isPassed = trial.passed;
+
+            return (
+              <div
+                key={trial.trialNumber}
+                className={`relative overflow-hidden rounded-xl border p-3 transition-all duration-200 ${
+                  isPassed
+                    ? 'border-emerald-300/90 bg-gradient-to-r from-emerald-50/80 via-teal-50/30 to-white shadow-xs hover:border-emerald-400 hover:shadow-sm'
+                    : 'border-rose-200 bg-gradient-to-r from-rose-50/80 via-orange-50/20 to-white hover:border-rose-300 shadow-2xs'
                 }`}
               >
-                Trial #{trial.trialNumber}
-              </span>
-              <span className="font-bold text-stone-900 tabular-nums">{trial.score}%</span>
-              <span
-                className={`text-[10px] font-semibold ${
-                  trial.passed ? 'text-emerald-700' : 'text-red-700'
-                }`}
-              >
-                {trial.passed ? '✓ Passed' : '✗ Failed'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              {trial.completedAt && (
-                <span className="text-[10px] text-stone-400">
-                  {new Date(trial.completedAt).toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </span>
-              )}
-              {trial.sessionId && (roundKey === 'technical' || roundKey === 'hr') && (
-                <button
-                  onClick={() => navigate(`/mock/scorecard/${trial.sessionId}`)}
-                  className={`text-[10px] font-semibold px-2 py-0.5 rounded border transition-all shadow-xs ${
-                    trial.passed
-                      ? 'text-amber-900 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 border-amber-200'
-                      : 'text-red-900 hover:text-red-950 bg-red-100 hover:bg-red-200 border-red-200'
+                {/* Left accent bar */}
+                <div
+                  className={`absolute left-0 top-0 bottom-0 w-1 ${
+                    isPassed ? 'bg-emerald-500' : 'bg-rose-400'
                   }`}
-                >
-                  📊 Scorecard
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
+                />
+
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pl-2">
+                  {/* Left section: Badge, Score, Result */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`text-xs font-bold px-2.5 py-0.5 rounded-lg shadow-2xs ${
+                        isPassed
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-rose-600 text-white'
+                      }`}
+                    >
+                      Attempt #{trial.trialNumber}
+                    </span>
+
+                    {/* Score display with micro bar */}
+                    <div className="flex items-center gap-2 bg-white/90 border border-stone-200/90 px-2.5 py-1 rounded-lg shadow-2xs">
+                      <span className="font-extrabold text-stone-900 text-xs tabular-nums">
+                        {trial.score}%
+                      </span>
+                      <div className="w-10 h-1.5 rounded-full bg-stone-200 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            isPassed ? 'bg-emerald-500' : 'bg-rose-400'
+                          }`}
+                          style={{ width: `${scorePct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <span
+                      className={`text-xs font-bold px-2 py-0.5 rounded-md ${
+                        isPassed
+                          ? 'bg-emerald-100/90 text-emerald-800 border border-emerald-200'
+                          : 'bg-rose-100/90 text-rose-800 border border-rose-200'
+                      }`}
+                    >
+                      {isPassed ? '✓ Passed' : '✕ Failed'}
+                    </span>
+                  </div>
+
+                  {/* Right section: Timestamp & Action button */}
+                  <div className="flex items-center gap-2 ml-auto">
+                    {trial.completedAt && (
+                      <span className="text-[11px] font-medium text-stone-400">
+                        {new Date(trial.completedAt).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    )}
+                    {trial.sessionId && (roundKey === 'technical' || roundKey === 'hr') && (
+                      <button
+                        onClick={() => navigate(`/mock/scorecard/${trial.sessionId}`)}
+                        className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all duration-200 shadow-xs hover:scale-[1.02] active:scale-95 ${
+                          isPassed
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600'
+                            : 'bg-amber-900 hover:bg-amber-950 text-white border border-amber-900'
+                        }`}
+                      >
+                        <span>View Evaluation</span>
+                        <span className="text-[10px]">→</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }
@@ -757,9 +805,10 @@ export default function PlacementHub() {
                                     {hasSession && (round.key === 'technical' || round.key === 'hr') && (
                                       <button
                                         onClick={() => navigate(`/mock/scorecard/${rd.sessionId}`)}
-                                        className="text-[11px] font-semibold text-amber-800 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-lg border border-amber-200 transition-all"
+                                        className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 hover:text-amber-950 bg-amber-100/90 hover:bg-amber-200 px-3 py-1.5 rounded-lg border border-amber-300 transition-all shadow-2xs hover:scale-[1.02] active:scale-95"
                                       >
-                                        📊 Scorecard
+                                        <span>View Evaluation</span>
+                                        <span className="text-[10px]">→</span>
                                       </button>
                                     )}
                                   </div>
