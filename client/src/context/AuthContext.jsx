@@ -100,7 +100,19 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  const value = { user, token, loading, login, register, logout };
+  /**
+   * Reset user password.
+   */
+  const resetPassword = async ({ email, password }) => {
+    try {
+      const { data } = await api.post('/auth/reset-password', { email, password });
+      return data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Password reset failed' };
+    }
+  };
+
+  const value = { user, token, loading, login, register, logout, resetPassword };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
