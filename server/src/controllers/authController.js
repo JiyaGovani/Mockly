@@ -68,3 +68,29 @@ export const login = asyncHandler(async (req, res) => {
 export const getMe = asyncHandler(async (req, res) => {
   return sendSuccess(res, { user: sanitizeUser(req.user) });
 });
+
+/**
+ * POST /api/auth/reset-password
+ */
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return sendError(res, 'Please provide email and new password', 400);
+  }
+
+  if (password.length < 6) {
+    return sendError(res, 'Password must be at least 6 characters', 400);
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    return sendError(res, 'No account found with this email address', 404);
+  }
+
+  user.password = password;
+  await user.save();
+
+  return sendSuccess(res, { message: 'Password reset successfully' });
+});
+
