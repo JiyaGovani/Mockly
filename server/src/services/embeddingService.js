@@ -17,6 +17,8 @@ export async function getEmbedding(text) {
     throw keyErr;
   }
 
+  let lastError = null;
+
   // Priority Loop: Primary Embedding Model tried across ALL Keys first before falling back
   for (const modelName of FALLBACK_EMBED_MODELS) {
     for (let keyIdx = 0; keyIdx < GEMINI_API_KEYS.length; keyIdx++) {
