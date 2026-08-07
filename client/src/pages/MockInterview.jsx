@@ -265,6 +265,14 @@ export default function MockInterview() {
     (q) => answers[q._id] && answers[q._id].trim() !== ''
   ).length;
 
+  const roundTitle = state?.placementRound === 'technical'
+    ? 'Technical Round'
+    : state?.placementRound === 'hr'
+    ? 'HR Round'
+    : state?.placementRound === 'aptitude'
+    ? 'Aptitude Round'
+    : 'Mock Interview';
+
   return (
     <div className="min-h-screen relative">
       {/* Background */}
@@ -278,7 +286,7 @@ export default function MockInterview() {
           {/* Session title */}
           <div className="p-4 border-b border-stone-200">
             <h2 className="text-sm font-bold text-stone-900 tracking-wide uppercase">
-              Mock Interview
+              {roundTitle}
             </h2>
             <p className="text-xs text-stone-650 mt-1">{session.role} • {session.questions.length} Questions</p>
           </div>

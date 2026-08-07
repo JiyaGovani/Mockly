@@ -25,15 +25,15 @@ export default function AdminLayout({ children }) {
       <aside className="w-56 shrink-0 flex flex-col border-r border-stone-200 sticky top-0 h-screen bg-white/80 backdrop-blur-sm">
         {/* Brand */}
         <div
-          className="flex items-center gap-2 px-5 py-5 cursor-pointer"
+          className="flex items-center gap-3 px-5 py-5 cursor-pointer"
           onClick={() => navigate('/admin')}
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-800 to-amber-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-amber-900/20">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-900 to-amber-700 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-amber-900/25 shrink-0">
             M
           </div>
           <div>
-            <span className="text-sm font-bold bg-gradient-to-r from-amber-900 to-amber-700 bg-clip-text text-transparent">
-              Mockly
+            <span className="text-lg font-bold bg-gradient-to-r from-amber-950 via-amber-900 to-amber-700 bg-clip-text text-transparent tracking-tight">
+              Mockly <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-900/10 text-amber-900 border border-amber-900/15 ml-0.5">AI</span>
             </span>
             <span className="block text-xs text-stone-400 -mt-0.5">Admin Panel</span>
           </div>
